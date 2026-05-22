@@ -3,141 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quick UI Design</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #0f172a; /* Deep slate background */
-      color: #f8fafc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    /* Glassmorphism Dashboard Card */
-    .card {
-      background-color: #1e293b; /* Dark slate card body */
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Profile Header */
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6); /* Blue to purple gradient placeholder */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.25rem;
-    }
-
-    .user-info h2 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #f1f5f9;
-    }
-
-    .user-info p {
-      font-size: 0.875rem;
-      color: #94a3b8;
-    }
-
-    /* Quick Stats Section */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      background-color: #0f172a;
-      padding: 12px;
-      border-radius: 12px;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-
-    .stat-item span {
-      display: block;
-    }
-
-    .stat-label {
-      font-size: 0.75rem;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #3b82f6; /* Accent color */
-    }
-
-    /* Action Buttons */
-    .actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .btn {
-      font-family: inherit;
-      font-size: 0.938rem;
-      font-weight: 500;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
-    }
-
-    .btn-primary {
-      background-color: #3b82f6;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: #2563eb;
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background-color: transparent;
-      color: #94a3b8;
-      border: 1px solid #334155;
-    }
-
-    .btn-secondary:hover {
-      background-color: #334155;
-      color: #f1f5f9;
-    }
-  </style>
+  <title>User Profile Dashboard</title>
+  <!-- Link to External CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- UI Component -->
+  <!-- UI Component Card -->
   <div class="card">
     <div class="header">
       <div class="avatar">JD</div>
@@ -153,8 +25,9 @@
         <span class="stat-value">24</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Views</span>
-        <span class="stat-value">12.5k</span>
+        <span class="stat-label">Followers</span>
+        <!-- Added an ID here so JS can update this count dynamically -->
+        <span class="stat-value" id="follower-count">1,250</span>
       </div>
       <div class="stat-item">
         <span class="stat-label">Rating</span>
@@ -163,10 +36,12 @@
     </div>
 
     <div class="actions">
-      <button class="btn btn-primary">View Portfolio</button>
-      <button class="btn btn-secondary">Send Message</button>
+      <button class="btn btn-primary" id="btn-follow">Follow</button>
+      <button class="btn btn-secondary" id="btn-message">Send Message</button>
     </div>
   </div>
 
+  <!-- Link to External JavaScript -->
+  <script src="script.js"></script>
 </body>
 </html>
