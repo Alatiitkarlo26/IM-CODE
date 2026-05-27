@@ -1,47 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile Dashboard</title>
-  <!-- Link to External CSS -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCIMS - Authorized Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- UI Component Card -->
-  <div class="card">
-    <div class="header">
-      <div class="avatar">JD</div>
-      <div class="user-info">
-        <h2>Jane Doe</h2>
-        <p>Product Designer</p>
-      </div>
-    </div>
-    
-    <div class="stats">
-      <div class="stat-item">
-        <span class="stat-label">Projects</span>
-        <span class="stat-value">24</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Followers</span>
-        <!-- Added an ID here so JS can update this count dynamically -->
-        <span class="stat-value" id="follower-count">1,250</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Rating</span>
-        <span class="stat-value">4.9</span>
-      </div>
-    </div>
+<div class="login-page-container">
+    <div class="login-wrapper">
+        
+        <div class="login-header">
+            <img src="guitar_logo.png" alt="GCIMS Logo" class="guitar-icon">
+            <h1>GCIMS</h1>
+            <p>Guitar Center IMS</p>
+        </div>
 
-    <div class="actions">
-      <button class="btn btn-primary" id="btn-follow">Follow</button>
-      <button class="btn btn-secondary" id="btn-message">Send Message</button>
-    </div>
-  </div>
+        <div class="login-form-box">
+            
+            <div class="role-selector">
+                <p>Authorized Personnel Login:</p>
+                <div class="role-buttons">
+                    <button type="button" class="role-btn active" id="staff-role" onclick="setRole('Staff')">Staff</button>
+                    <button type="button" class="role-btn" id="admin-role" onclick="setRole('Admin')">Admin</button>
+                </div>
+            </div>
 
- 
-  <script src="script.js"></script>
+            <form id="gcims-login-form">
+                <input type="hidden" id="selected-role" value="Staff">
+                
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="johier.parnton" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-actions">
+                    <label class="remember-me">
+                        <input type="checkbox"> Remember Me
+                    </label>
+                    <a href="#" class="forgot-pass">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="submit-btn">Login to System</button>
+            </form>
+
+            <p class="login-footer">System Access strictly for authorized personnel only.</p>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

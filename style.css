@@ -1,138 +1,191 @@
-/* Reset and Core Styles */
+/* style.css for GCIMS Login - Brown & Wood Accent Theme */
+
+/* 1. Global Reset & Fonts */
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #0f172a; /* Deep slate background */
-  color: #f8fafc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5efe6; /* Almond dust background - warm and inviting */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-/* Glassmorphism Dashboard Card */
-.card {
-  background-color: #1e293b; /* Dark slate card body */
-  border: 1px solid #334155;
-  border-radius: 16px;
-  padding: 24px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+/* 2. Main Container */
+.login-page-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Profile Header */
-.header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
+.login-wrapper {
+    width: 100%;
+    max-width: 450px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(74, 44, 17, 0.08); /* Custom shadow with a warm brown tint */
+    overflow: hidden;
+    border: 1px solid #e6dcce;
 }
 
-.avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6); /* Blue to purple gradient placeholder */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1.25rem;
+/* 3. Header Styling */
+.login-header {
+    background-color: #4a2c11; /* Rich Mahogany Dark Brown */
+    color: #fdfbf7;
+    padding: 30px;
+    text-align: center;
 }
 
-.user-info h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #f1f5f9;
+.guitar-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
 }
 
-.user-info p {
-  font-size: 0.875rem;
-  color: #94a3b8;
+.login-header h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: 1px;
 }
 
-/* Quick Stats Section */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  background-color: #0f172a;
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  text-align: center;
+.login-header p {
+    font-weight: 300;
+    font-size: 0.9rem;
+    opacity: 0.85;
 }
 
-.stat-item span {
-  display: block;
+/* 4. Form Styling */
+.login-form-box {
+    padding: 40px;
 }
 
-.stat-label {
-  font-size: 0.75rem;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
+.role-selector {
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-.stat-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #3b82f6;
-  transition: color 0.3s ease;
+.role-selector p {
+    color: #8c7662; /* Soft muted vintage brown */
+    font-size: 0.9rem;
+    margin-bottom: 15px;
 }
 
-/* Action Buttons */
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.role-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }
 
-.btn {
-  font-family: inherit;
-  font-size: 0.938rem;
-  font-weight: 500;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
+.role-btn {
+    padding: 12px 30px;
+    border: 2px solid #cdbfae;
+    background: transparent;
+    color: #8c7662;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 30px; /* Pill layout */
+    transition: all 0.3s ease;
 }
 
-.btn-primary {
-  background-color: #3b82f6;
-  color: white;
+.role-btn.active {
+    background-color: #b85c14; /* Warm Sunburst Amber Accent */
+    border-color: #b85c14;
+    color: #ffffff;
+    box-shadow: 0 4px 6px rgba(184, 92, 20, 0.2);
 }
 
-.btn-primary:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
+/* 5. Input Groups */
+.input-group {
+    margin-bottom: 20px;
 }
 
-/* Following state class triggered by JS */
-.btn-primary.following {
-  background-color: #10b981; /* Green success color */
-}
-.btn-primary.following:hover {
-  background-color: #059669;
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: #94a3b8;
-  border: 1px solid #334155;
+.input-group label {
+    display: block;
+    color: #4a2c11; /* Dark wood tones for form typography */
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    font-weight: 500;
 }
 
-.btn-secondary:hover {
-  background-color: #334155;
-  color: #f1f5f9;
+.input-group input {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #dcd1c4;
+    border-radius: 8px;
+    background-color: #fdfbf7; /* Polished cream input background */
+    font-size: 1rem;
+    color: #331e0b;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #b85c14; /* Warm Amber Focus */
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(184, 92, 20, 0.1);
+}
+
+/* 6. Actions & Buttons */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #8c7662;
+    margin-bottom: 30px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.forgot-pass {
+    color: #b85c14; /* Amber links */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-pass:hover {
+    text-decoration: underline;
+    color: #91460c;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: #b85c14; /* Warm Amber primary button */
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(184, 92, 20, 0.25);
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.submit-btn:hover {
+    background: #91460c; /* Burnished deeper wood tone on hover */
+}
+
+.submit-btn:active {
+    transform: scale(0.99);
+}
+
+/* 7. Footer */
+.login-footer {
+    text-align: center;
+    color: #cdbfae;
+    font-size: 0.8rem;
+    margin-top: 30px;
+    font-weight: 300;
 }
