@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fretboard — Inventory Management Workspace</title>
+  <title>Fretboard — Enterprise Admin Console</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -32,46 +32,30 @@
       flex-direction: column;
     }
 
-    /* ─── Wood grain background ─── */
+    /* ─── Fine Premium Wood Textured Backplane ─── */
     .bg {
       position: fixed;
       inset: 0;
       background:
-        repeating-linear-gradient(
-          92deg,
-          transparent 0px, transparent 18px,
-          rgba(90,40,10,0.05) 18px, rgba(90,40,10,0.05) 19px
-        ),
-        repeating-linear-gradient(
-          88deg,
-          transparent 0px, transparent 38px,
-          rgba(60,20,5,0.04) 38px, rgba(60,20,5,0.04) 39px
-        ),
-        linear-gradient(170deg, #1a0c06 0%, #2e130a 40%, #1d0e07 70%, #120804 100\Build %);
+        repeating-linear-gradient(92deg, transparent 0px, transparent 18px, rgba(90,40,10,0.05) 18px, rgba(90,40,10,0.05) 19px),
+        repeating-linear-gradient(88deg, transparent 0px, transparent 38px, rgba(60,20,5,0.04) 38px, rgba(60,20,5,0.04) 39px),
+        linear-gradient(170deg, #1a0c06 0%, #2e130a 40%, #1d0e07 70%, #120804 100%);
       z-index: -2;
     }
 
-    /* ─── Horizontal Ambient Fret Strings ─── */
-    .bg-strings {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      opacity: 0.4;
-    }
+    .bg-strings { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.35; }
     .bg-string {
-      position: absolute;
-      left: 0; right: 0; height: 1px;
+      position: absolute; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent 0%, var(--string) 15%, var(--string) 85%, transparent 100%);
     }
     .bg-string:nth-child(1) { top: 15%; }
-    .bg-string:nth-child(2) { top: 40%; height: 1.5px; }
-    .bg-string:nth-child(3) { top: 70%; height: 2px; }
+    .bg-string:nth-child(2) { top: 45%; height: 1.5px; }
+    .bg-string:nth-child(3) { top: 75%; height: 2px; }
 
-    /* ─── Top Header Bar ─── */
+    /* ─── Global System Layout Header ─── */
     .top-bar {
       background: rgba(26, 12, 6, 0.95);
-      border-bottom: 1px solid rgba(228,169,75,0.2);
+      border-bottom: 1px solid rgba(228,169,75,0.22);
       padding: 15px 30px;
       display: flex;
       justify-content: space-between;
@@ -82,648 +66,567 @@
       backdrop-filter: blur(8px);
     }
 
-    .logo-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .logo-icon { width: 34px; height: 34px; }
-    .brand { display: flex; flex-direction: column; }
-    .brand-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--gold);
-      line-height: 1;
-    }
-    .brand-sub {
-      font-size: 8px;
-      color: rgba(228,169,75,0.45);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      margin-top: 3px;
-    }
+    .logo-row { display: flex; align-items: center; gap: 12px; }
+    .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--gold); line-height: 1; }
+    .brand-sub { font-size: 8px; color: rgba(228,169,75,0.45); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 3px; }
 
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-    }
     .role-badge {
-      background: rgba(228, 169, 75, 0.1);
-      border: 1px solid rgba(228, 169, 75, 0.3);
-      color: var(--gold);
-      padding: 3px 8px;
-      border-radius: 3px;
-      font-size: 10px;
-      text-transform: uppercase;
+      background: rgba(228, 169, 75, 0.08); border: 1px solid rgba(228, 169, 75, 0.3);
+      color: var(--gold); padding: 3px 8px; border-radius: 3px; font-size: 10px; text-transform: uppercase;
     }
 
-    /* ─── Layout Configuration ─── */
-    .workspace {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: calc(100vh - 65px);
+    /* ─── Section Configuration Tabs ─── */
+    .nav-tabs { display: flex; background: rgba(15, 7, 3, 0.6); border-bottom: 1px solid rgba(228,169,75,0.12); padding: 0 30px; }
+    .tab-btn {
+      padding: 14px 20px; background: none; border: none; border-bottom: 2px solid transparent;
+      color: rgba(245,238,216,0.45); font-family: inherit; font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.08em; cursor: pointer; transition: all 0.2s;
     }
+    .tab-btn:hover { color: var(--gold); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--amber); background: rgba(228,169,75,0.04); }
 
-    /* ─── Sidebar Filters ─── */
-    .sidebar {
-      background: rgba(28, 12, 5, 0.6);
-      border-right: 1px solid rgba(228,169,75,0.15);
-      padding: 30px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-    }
-
-    .sidebar-section-title {
-      font-size: 9px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(228,169,75,0.55);
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .search-wrap {
-      position: relative;
-    }
-    .search-wrap svg {
-      position: absolute;
-      left: 12px; top: 50%;
-      transform: translateY(-50%);
-      width: 14px; height: 14px;
-      color: rgba(228,169,75,0.35);
-    }
+    /* ─── Structural Workspace Grid Splitter ─── */
+    .workspace { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 110px); }
+    .sidebar { background: rgba(28, 12, 5, 0.6); border-right: 1px solid rgba(228,169,75,0.15); padding: 30px 20px; display: flex; flex-direction: column; gap: 25px; }
+    .sidebar-section-title { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(228,169,75,0.55); margin-bottom: 10px; display: block; }
+    
+    .search-wrap { position: relative; }
+    .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: rgba(228,169,75,0.35); }
     .search-input {
-      width: 100%;
-      padding: 10px 12px 10px 36px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(228,169,75,0.15);
-      border-radius: 3px;
-      color: var(--cream);
-      font-family: inherit;
-      font-size: 12px;
-      outline: none;
-    }
-    .search-input:focus {
-      border-color: rgba(228,169,75,0.4);
-      background: rgba(255,255,255,0.06);
+      width: 100%; padding: 10px 12px 10px 36px; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(228,169,75,0.15); border-radius: 3px; color: var(--cream); font-family: inherit; font-size: 12px; outline: none;
     }
 
-    .filter-select {
-      width: 100%;
-      padding: 10px;
-      background: #2a1209;
-      border: 1px solid rgba(228,169,75,0.18);
-      border-radius: 3px;
-      color: var(--cream);
-      font-family: inherit;
-      font-size: 12px;
-      outline: none;
-      cursor: pointer;
-    }
+    .filter-select { width: 100%; padding: 10px; background: #2a1209; border: 1px solid rgba(228,169,75,0.18); border-radius: 3px; color: var(--cream); font-family: inherit; font-size: 12px; outline: none; }
 
-    .radio-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .radio-label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      cursor: pointer;
-      color: rgba(245,238,216,0.7);
-    }
-    .radio-label input {
-      accent-color: var(--amber);
-    }
+    /* ─── Display Panels Core Viewports ─── */
+    .content-canvas { padding: 30px; display: flex; flex-direction: column; gap: 30px; }
+    .view-pane { display: none; flex-direction: column; gap: 30px; }
+    .view-pane.active { display: flex; }
 
-    /* ─── Main Content Area ─── */
-    .content-canvas {
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      overflow-y: auto;
-    }
-
-    /* Quick Metrics Summary */
-    .metrics-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-    .metric-card {
-      background: var(--dark-card);
-      border: 1px solid rgba(228,169,75,0.15);
-      border-radius: 4px;
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-    .metric-label {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: rgba(228,169,75,0.45);
-    }
-    .metric-val {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--gold);
-      margin-top: 5px;
-    }
-
-    /* Control Bar Actions */
-    .action-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .panel-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--parchment);
-    }
-    .btn-group {
-      display: flex;
-      gap: 12px;
-    }
+    .action-row { display: flex; justify-content: space-between; align-items: center; }
+    .panel-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--parchment); }
+    .btn-group { display: flex; gap: 12px; }
+    
     .btn {
-      padding: 10px 18px;
-      background: linear-gradient(135deg, var(--amber), var(--rosewood) 80%);
-      border: none;
-      border-radius: 3px;
-      color: var(--cream);
-      font-family: inherit;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 15px rgba(200,129,42,0.2);
+      padding: 10px 18px; background: linear-gradient(135deg, var(--amber), var(--rosewood) 80%);
+      border: none; border-radius: 3px; color: var(--cream); font-family: inherit; font-size: 11px;
+      letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 15px rgba(200,129,42,0.15);
     }
-    .btn:hover { transform: translateY(-1px); opacity: 0.95; }
-    .btn-secondary {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(228,169,75,0.25);
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+    .btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid rgba(228,169,75,0.25); box-shadow: none; }
+    .btn-danger-link { background: none; border: none; color: var(--danger); font-family: inherit; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+    .btn-danger-link:hover { text-decoration: underline; }
 
-    /* Data Presentation Table */
-    .table-container {
-      background: var(--dark-card);
-      border: 1px solid rgba(228,169,75,0.25);
-      border-radius: 4px;
-      overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 12px;
-    }
-    th {
-      background: rgba(59, 26, 14, 0.6);
-      padding: 14px 16px;
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(228,169,75,0.6);
-      border-bottom: 1px solid rgba(228,169,75,0.2);
-    }
-    td {
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(228,169,75,0.08);
-      color: var(--parchment);
-    }
-    tr:hover td {
-      background: rgba(228,169,75,0.03);
-      color: var(--cream);
-    }
-    tr:last-child td { border-bottom: none; }
+    /* ─── Structural Core Table Frameworks ─── */
+    .table-container { background: var(--dark-card); border: 1px solid rgba(228,169,75,0.22); border-radius: 4px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+    th { background: rgba(59, 26, 14, 0.6); padding: 14px 16px; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(228,169,75,0.6); border-bottom: 1px solid rgba(228,169,75,0.2); }
+    td { padding: 14px 16px; border-bottom: 1px solid rgba(228,169,75,0.08); color: var(--parchment); vertical-align: middle; }
+    tr:hover td { background: rgba(228,169,75,0.02); }
 
-    .badge-status {
-      padding: 2px 6px;
-      border-radius: 2px;
-      font-size: 10px;
-      text-transform: uppercase;
-    }
-    .status-instock { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-    .status-low { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    /* ─── Active Architectural Toggle Switches ─── */
+    .switch-label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; user-select: none; }
+    .switch-box { position: relative; width: 34px; height: 18px; background: rgba(255,255,255,0.1); border-radius: 9px; border: 1px solid rgba(228,169,75,0.3); transition: background 0.2s; }
+    .switch-box::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; background: rgba(228,169,75,0.6); border-radius: 50%; transition: transform 0.2s, background 0.2s; }
+    input[type="checkbox"] { display: none; }
+    input[type="checkbox"]:checked + .switch-box { background: rgba(16, 185, 129, 0.15); border-color: var(--success); }
+    input[type="checkbox"]:checked + .switch-box::after { transform: translateX(16px); background: var(--success); }
 
-    /* ─── Modal Architecture ─── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(10, 5, 3, 0.85);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .modal-card {
-      width: 460px;
-      background: linear-gradient(145deg, rgba(42,18,9,0.99), rgba(28,12,5,0.99));
-      border: 1px solid rgba(228,169,75,0.35);
-      border-radius: 4px;
-      padding: 40px;
-      box-shadow: 0 30px 70px rgba(0,0,0,0.8);
-      transform: translateY(15px);
-      transition: transform 0.3s ease;
-    }
-    .modal-overlay.active .modal-card {
-      transform: translateY(0);
-    }
-    .modal-header {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--gold);
-      margin-bottom: 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-close {
-      background: none; border: none; color: rgba(228,169,75,0.5);
-      font-size: 20px; cursor: pointer;
-    }
-    .modal-close:hover { color: var(--gold); }
+    .badge-status { padding: 2px 6px; border-radius: 2px; font-size: 10px; text-transform: uppercase; font-weight: 500; }
+    .status-instock { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+    .status-disabled { background: rgba(255,255,255,0.05); color: rgba(245,238,216,0.35); border: 1px dashed rgba(255,255,255,0.1); }
+    .tx-in { color: var(--success); font-weight: bold; }
+    .tx-out { color: var(--danger); font-weight: bold; }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
+    /* ─── Management Modals Base ─── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 5, 3, 0.85); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-card { width: 460px; background: linear-gradient(145deg, rgba(42,18,9,0.99), rgba(28,12,5,0.99)); border: 1px solid rgba(228,169,75,0.35); border-radius: 4px; padding: 40px; }
+    .modal-header { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-close { background: none; border: none; color: rgba(228,169,75,0.5); font-size: 20px; cursor: pointer; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .form-field { margin-bottom: 18px; }
     .form-field.full { grid-column: span 2; }
-    .form-field label {
-      display: block; font-size: 9px; letter-spacing: 0.15em;
-      text-transform: uppercase; color: rgba(228,169,75,0.55);
-      margin-bottom: 6px;
-    }
+    .form-field label { display: block; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(228,169,75,0.55); margin-bottom: 6px; }
     .form-field input, .form-field select {
-      width: 100%; padding: 11px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(228,169,75,0.18);
-      border-radius: 3px; color: var(--cream);
-      font-family: inherit; font-size: 13px; outline: none;
-    }
-    .form-field input:focus, .form-field select:focus {
-      border-color: var(--gold); background: rgba(255,255,255,0.07);
+      width: 100%; padding: 11px; background: rgba(255,255,255,0.04); border: 1px solid rgba(228,169,75,0.18); border-radius: 3px; color: var(--cream); font-family: inherit; font-size: 13px; outline: none;
     }
   </style>
 </head>
 <body>
 
   <div class="bg"></div>
-  <div class="bg-strings">
-    <div class="bg-string"></div>
-    <div class="bg-string"></div>
-    <div class="bg-string"></div>
-  </div>
+  <div class="bg-strings"><div class="bg-string"></div><div class="bg-string"></div><div class="bg-string"></div></div>
 
   <header class="top-bar">
     <div class="logo-row">
-      <svg class="logo-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="18" y="2" width="8" height="28" rx="4" fill="#6b2d1a" stroke="#c8812a" stroke-width="1"/>
-        <rect x="20" y="26" width="4" height="16" rx="2" fill="#3b1a0e" stroke="#c8812a" stroke-width="0.8"/>
-        <circle cx="22" cy="40" r="3" fill="#c8812a" opacity="0.8"/>
-        <rect x="13" y="6" width="18" height="3" rx="1.5" fill="#e4a94b" opacity="0.7"/>
-        <circle cx="12" cy="10" r="3" fill="#c8812a" stroke="#e4a94b" stroke-width="0.8"/>
-        <circle cx="32" cy="10" r="3" fill="#c8812a" stroke="#e4a94b" stroke-width="0.8"/>
-        <circle cx="12" cy="18" r="3" fill="#c8812a" stroke="#e4a94b" stroke-width="0.8"/>
-        <circle cx="32" cy="18" r="3" fill="#c8812a" stroke="#e4a94b" stroke-width="0.8"/>
-      </svg>
       <div class="brand">
         <span class="brand-name">Fretboard</span>
-        <span class="brand-sub">Guitar Inventory System</span>
+        <span class="brand-sub">System Enterprise Console</span>
       </div>
     </div>
     <div class="user-profile">
       <span>Jian Karlo H. Alatiit</span>
-      <span class="role-badge">Administrator</span>
+      <span class="role-badge">Super Admin</span>
     </div>
   </header>
 
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchView('products')">🎸 Products Matrix</button>
+    <button class="tab-btn" onclick="switchView('brands')">🏷️ Brand Lifecycle</button>
+    <button class="tab-btn" onclick="switchView('suppliers')">📦 Suppliers Profiles</button>
+    <button class="tab-btn" onclick="switchView('history')">📜 Transaction Ledger</button>
+  </nav>
+
   <div class="workspace">
-    
     <aside class="sidebar">
       <div>
-        <span class="sidebar-section-title">Search Matrix</span>
+        <span class="sidebar-section-title">Database Scope Filter</span>
         <div class="search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" id="searchBar" class="search-input" placeholder="Search product name..." oninput="filterRegistry()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="globalSearch" class="search-input" placeholder="Query entities..." oninput="executeGlobalFilters()">
         </div>
       </div>
-
       <div>
-        <span class="sidebar-section-title">Category Node</span>
-        <select id="categoryFilter" class="filter-select" onchange="filterRegistry()">
+        <span class="sidebar-section-title">Category Assignment</span>
+        <select id="categorySelect" class="filter-select" onchange="executeGlobalFilters()">
           <option value="ALL">All Categories</option>
           <option value="Guitars">Guitars</option>
           <option value="Amplifiers">Amplifiers</option>
-          <option value="Pedals">Pedals & FX</option>
-          <option value="Accessories">Accessories</option>
+          <option value="Pedals">Pedals</option>
         </select>
-      </div>
-
-      <div>
-        <span class="sidebar-section-title">Brand Node</span>
-        <select id="brandFilter" class="filter-select" onchange="filterRegistry()">
-          <option value="ALL">All Brands</option>
-          <option value="Fender">Fender</option>
-          <option value="Gibson">Gibson</option>
-          <option value="Ibanez">Ibanez</option>
-          <option value="Boss">Boss</option>
-        </select>
-      </div>
-
-      <div>
-        <span class="sidebar-section-title">Stock Audit Threshold</span>
-        <div class="radio-group">
-          <label class="radio-label">
-            <input type="radio" name="stockStatus" value="ALL" checked onchange="filterRegistry()"> All Matrix Records
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="stockStatus" value="LOW" onchange="filterRegistry()"> Low Stock Warnings (&lt; 10)
-          </label>
-        </div>
       </div>
     </aside>
 
     <main class="content-canvas">
       
-      <section class="metrics-row">
-        <div class="metric-card">
-          <div class="metric-label">Total Unique SKUs</div>
-          <div class="metric-val" id="metricTotalSKU">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Total Pieces Tracked</div>
-          <div class="metric-val" id="metricTotalUnits">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Low Stock Alarms</div>
-          <div class="metric-val" id="metricLowStock" style="color: var(--danger);">0</div>
-        </div>
-      </section>
+      <div id="pane-products" class="view-pane active">
+        <section class="action-row">
+          <h2 class="panel-title">Master Production Product Matrix</h2>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="toggleModal('adjustmentModal', true)">🔄 Balance Modification</button>
+            <button class="btn" onclick="toggleModal('productModal', true)">➕ Provision New Product</button>
+          </div>
+        </section>
+        <section class="table-container">
+          <table>
+            <thead>
+              <tr><th>SKU ID</th><th>Model Name</th><th>Category Line</th><th>Brand Origin</th><th>Price</th><th>Stock</th><th>Operational State</th><th style="text-align:right;">Data Controls</th></tr>
+            </thead>
+            <tbody id="table-products"></tbody>
+          </table>
+        </section>
+      </div>
 
-      <section class="action-row">
-        <h2 class="panel-title">Stock Registry Ledger</h2>
-        <div class="btn-group">
-          <button class="btn btn-secondary" onclick="toggleModal('stockModal', true)">🔄 Stock Adjustment</button>
-          <button class="btn" onclick="toggleModal('productModal', true)">➕ Add Product</button>
-        </div>
-      </section>
+      <div id="pane-brands" class="view-pane">
+        <section class="action-row">
+          <h2 class="panel-title">Brand Manufacturer Configuration Directory</h2>
+          <button class="btn" onclick="toggleModal('brandModal', true)">➕ Provision Manufacturer Brand</button>
+        </section>
+        <section class="table-container">
+          <table>
+            <thead>
+              <tr><th>Brand ID</th><th>Brand Designation</th><th>Equipment Type Specialty</th><th>Global Active Scope</th><th style="text-align:right;">Data Controls</th></tr>
+            </thead>
+            <tbody id="table-brands"></tbody>
+          </table>
+        </section>
+      </div>
 
-      <section class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Product Specification</th>
-              <th>Category</th>
-              <th>Brand</th>
-              <th>Unit Price</th>
-              <th>Qty on Hand</th>
-              <th>Location</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="inventoryTableBody">
-            </tbody>
-        </table>
-      </section>
+      <div id="pane-suppliers" class="view-pane">
+        <section class="action-row">
+          <h2 class="panel-title">Registered Business Wholesale Entities</h2>
+          <button class="btn" onclick="toggleModal('supplierModal', true)">➕ Authorize Supplier Node</button>
+        </section>
+        <section class="table-container">
+          <table>
+            <thead>
+              <tr><th>Supplier ID</th><th>Company Legal Entity</th><th>Contact Phone</th><th>Corporate Email</th><th style="text-align:right;">Data Controls</th></tr>
+            </thead>
+            <tbody id="table-suppliers"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <div id="pane-history" class="view-pane">
+        <section class="action-row">
+          <h2 class="panel-title">System Transaction History Log</h2>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:11px; color:rgba(228,169,75,0.6)">Filter Ledger State:</span>
+            <select id="txFilter" class="filter-select" style="width:180px;" onchange="renderHistoryRegistry()">
+              <option value="ALL">Show All Ledger Entries</option>
+              <option value="IN">Isolate Inbound (STOCK-IN)</option>
+              <option value="OUT">Isolate Outbound (STOCK-OUT)</option>
+            </select>
+          </div>
+        </section>
+        <section class="table-container">
+          <table>
+            <thead>
+              <tr><th>Log-ID</th><th>Target Product</th><th>Authorized User</th><th>Associated Supplier</th><th>Ledger State Direction</th><th>Unit Delta</th><th>Timestamp Logged</th></tr>
+            </thead>
+            <tbody id="table-history"></tbody>
+          </table>
+        </section>
+      </div>
+
     </main>
   </div>
 
   <div id="productModal" class="modal-overlay">
     <div class="modal-card">
-      <div class="modal-header">
-        <h3>New Product Specification</h3>
-        <button class="modal-close" onclick="toggleModal('productModal', false)">&times;</button>
-      </div>
-      <form onsubmit="handleCreateProduct(event)">
+      <div class="modal-header"><h3>Catalog New Product Specification</h3><button class="modal-close" onclick="toggleModal('productModal', false)">&times;</button></div>
+      <form onsubmit="createNewProduct(event)">
         <div class="form-grid">
-          <div class="form-field full">
-            <label>Product Name</label>
-            <input type="text" id="newProdName" placeholder="e.g., Player Stratocaster HSS" required />
-          </div>
-          <div class="form-field">
-            <label>Category</label>
-            <select id="newProdCategory">
-              <option value="Guitars">Guitars</option>
-              <option value="Amplifiers">Amplifiers</option>
-              <option value="Pedals">Pedals</option>
-              <option value="Accessories">Accessories</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Brand</label>
-            <select id="newProdBrand">
-              <option value="Fender">Fender</option>
-              <option value="Gibson">Gibson</option>
-              <option value="Ibanez">Ibanez</option>
-              <option value="Boss">Boss</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Unit Price (₱)</label>
-            <input type="number" id="newProdPrice" placeholder="45000" min="0" step="0.01" required />
-          </div>
-          <div class="form-field">
-            <label>Initial Quantity</label>
-            <input type="number" id="newProdQty" placeholder="12" min="0" required />
-          </div>
-          <div class="form-field full">
-            <label>Stockroom Location</label>
-            <input type="text" id="newProdLocation" placeholder="e.g., Row A-S3" required />
-          </div>
+          <div class="form-field full"><label>Model Name</label><input type="text" id="p-name" required></div>
+          <div class="form-field"><label>Category Line</label><select id="p-cat"><option value="Guitars">Guitars</option><option value="Amplifiers">Amplifiers</option><option value="Pedals">Pedals</option></select></div>
+          <div class="form-field"><label>Brand Origin</label><select id="p-brand-select"></select></div>
+          <div class="form-field"><label>Retail Price (₱)</label><input type="number" id="p-price" min="0" step="0.01" required></div>
+          <div class="form-field"><label>Initial Balance Stock</label><input type="number" id="p-qty" min="0" required></div>
+          <div class="form-field full"><label>Fulfillment Grid Location</label><input type="text" id="p-loc" required placeholder="Rack A-1"></div>
         </div>
-        <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Commit Product to Registry</button>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Commit Record to Database</button>
       </form>
     </div>
   </div>
 
-  <div id="stockModal" class="modal-overlay">
+  <div id="brandModal" class="modal-overlay">
     <div class="modal-card">
-      <div class="modal-header">
-        <h3>Stock Level Adjustment Ledger</h3>
-        <button class="modal-close" onclick="toggleModal('stockModal', false)">&times;</button>
-      </div>
-      <form onsubmit="handleStockAdjustment(event)">
-        <div class="form-field">
-          <label>Select Matrix Target Product</label>
-          <select id="adjTargetProduct">
-            </select>
-        </div>
+      <div class="modal-header"><h3>Provision New Manufacturing Entity</h3><button class="modal-close" onclick="toggleModal('brandModal', false)">&times;</button></div>
+      <form onsubmit="createNewBrand(event)">
+        <div class="form-field"><label>Brand Corporate Name</label><input type="text" id="b-name" required placeholder="e.g., Ibanez"></div>
+        <div class="form-field"><label>Product Specialty Type</label><input type="text" id="b-type" required placeholder="e.g., Solid-Body Electric Guitars"></div>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Instantiate Brand Node</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="supplierModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header"><h3>Provision New Corporate Supplier</h3><button class="modal-close" onclick="toggleModal('supplierModal', false)">&times;</button></div>
+      <form onsubmit="createNewSupplier(event)">
         <div class="form-grid">
-          <div class="form-field">
-            <label>Transaction Type</label>
-            <select id="adjType">
-              <option value="IN">Stock-In (Replenishment)</option>
-              <option value="OUT">Stock-Out (Disbursement)</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Adjustment Units</label>
-            <input type="number" id="adjQty" min="1" required placeholder="5"/>
-          </div>
+          <div class="form-field full"><label>Company Legal Designation</label><input type="text" id="s-name" required></div>
+          <div class="form-field"><label>Contact Telephone</label><input type="text" id="s-phone" required></div>
+          <div class="form-field"><label>Corporate Endpoint Email</label><input type="email" id="s-email" required></div>
         </div>
-        <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Execute Stock Update</button>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Authorize Supplier Profile</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="adjustmentModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header"><h3>Execute Stock Balance Entry</h3><button class="modal-close" onclick="toggleModal('adjustmentModal', false)">&times;</button></div>
+      <form onsubmit="executeAdjustment(event)">
+        <div class="form-field"><label>Target Asset Record</label><select id="adj-product"></select></div>
+        <div class="form-grid">
+          <div class="form-field"><label>Delta Direct State</label><select id="adj-type"><option value="IN">STOCK-IN (Inbound Supply)</option><option value="OUT">STOCK-OUT (Outbound Disbursal)</option></select></div>
+          <div class="form-field"><label>Units Volume</label><input type="number" id="adj-qty" min="1" required value="1"></div>
+          <div class="form-field full"><label>Sourced Vendor Entity</label><select id="adj-supplier"></select></div>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Commit Log Entry & Modify Balances</button>
       </form>
     </div>
   </div>
 
   <script>
-    // Mock Database Matrix based closely on project spec mappings
-    let dbProducts = [
-      { id: 101, name: "Affinity Series Stratocaster", category: "Guitars", brand: "Fender", price: 18500.00, qty: 14, location: "Rack A-1", accurate: true },
-      { id: 102, name: "Les Paul Standard '60s", category: "Guitars", brand: "Gibson", price: 145000.00, qty: 3, location: "Vault Display", accurate: true },
-      { id: 103, name: "Katana 50 MkII Amplifier", category: "Amplifiers", brand: "Boss", price: 16500.00, qty: 22, location: "Row B-2", accurate: true },
-      { id: 104, name: "DS-1 Distortion Pedal", category: "Pedals", brand: "Boss", price: 4200.00, qty: 8, location: "Counter Glass", accurate: true },
-      { id: 105, name: "RG421 Electric Guitar", category: "Guitars", brand: "Ibanez", price: 21000.00, qty: 11, location: "Rack A-3", accurate: true }
+    // State Architecture Mapped to Document Structural Definitions
+    let tableProducts = [
+      { id: 101, name: "Affinity Series Stratocaster", category: "Guitars", brand: "Fender", price: 18500.00, qty: 14, location: "Rack A-1", isActive: true },
+      { id: 102, name: "Les Paul Standard '60s", category: "Guitars", brand: "Gibson", price: 145000.00, qty: 3, location: "Vault Display", isActive: true },
+      { id: 103, name: "Katana 50 MkII Amplifier", category: "Amplifiers", brand: "Boss", price: 16500.00, qty: 22, location: "Row B-2", isActive: false }
     ];
 
-    // Initialize DOM Component Configurations
+    let tableBrands = [
+      { id: 301, name: "Fender", type: "Guitars & Amps", isActive: true },
+      { id: 302, name: "Gibson", type: "Premium Electric Guitars", isActive: true },
+      { id: 303, name: "Boss", type: "Effects Pedals & Solid-State Amps", isActive: true }
+    ];
+
+    let tableSuppliers = [
+      { id: 501, name: "Yupangco Music Corp", phone: "0288911161", email: "info@yupangco.com" },
+      { id: 502, name: "JB Music Philippines", phone: "0284260341", email: "b2b@jbmusic.com.ph" }
+    ];
+
+    let tableHistory = [
+      { txId: 9001, productName: "Katana 50 MkII Amplifier", user: "Admin (Karlo)", supplier: "Yupangco Music Corp", type: "IN", quantity: 10, date: "2026-06-02 14:22" },
+      { txId: 9002, productName: "Affinity Series Stratocaster", user: "Staff (Lacao)", supplier: "N/A (Customer)", type: "OUT", quantity: 1, date: "2026-06-04 09:10" }
+    ];
+
     document.addEventListener("DOMContentLoaded", () => {
-      renderRegistry();
-      populateProductSelect();
+      refreshInterfaceViews();
     });
 
-    // Control modal structural viewport triggers
-    function toggleModal(modalId, visible) {
-      const modal = document.getElementById(modalId);
-      if (visible) {
+    function switchView(viewName) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`pane-${viewName}`).classList.add('active');
+    }
+
+    function toggleModal(id, open) {
+      const modal = document.getElementById(id);
+      if(open) {
         modal.classList.add('active');
-        if(modalId === 'stockModal') populateProductSelect();
+        if(id === 'adjustmentModal') setupAdjustmentDropdowns();
+        if(id === 'productModal') populateBrandDropdownMenu();
       } else {
         modal.classList.remove('active');
       }
     }
 
-    // Refresh Selector Targets inside standard transaction configurations
-    function populateProductSelect() {
-      const select = document.getElementById("adjTargetProduct");
-      select.innerHTML = dbProducts.map(p => `<option value="${p.id}">${p.brand} — ${p.name} (${p.qty} left)</option>`).join("");
+    function setupAdjustmentDropdowns() {
+      // Filter out products whose brand is inactive to prevent transactions on discontinued brands
+      const availableProducts = tableProducts.filter(p => {
+        const parentBrand = tableBrands.find(b => b.name === p.brand);
+        return parentBrand ? parentBrand.isActive : true;
+      });
+
+      document.getElementById('adj-product').innerHTML = availableProducts.map(p => `<option value="${p.id}">${p.brand} — ${p.name} (${p.qty} units available)</option>`).join('');
+      document.getElementById('adj-supplier').innerHTML = `<option value="0">Retail Customer Disbursal (No Supplier Link)</option>` + tableSuppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
     }
 
-    // Render Data View Matrix Lists
-    function renderRegistry(filteredData = dbProducts) {
-      const tbody = document.getElementById("inventoryTableBody");
-      
-      if(filteredData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: rgba(228,169,75,0.4);">No products found matching active structural parameters.</td></tr>`;
-        updateMetrics(filteredData);
+    function populateBrandDropdownMenu() {
+      // Dynamic rendering ensures you can only select active brands when declaring new items
+      const activeBrands = tableBrands.filter(b => b.isActive);
+      document.getElementById('p-brand-select').innerHTML = activeBrands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+    }
+
+    /* ─── Global State Rendering Pipelines ─── */
+    function refreshInterfaceViews() {
+      renderProductsRegistry();
+      renderBrandsRegistry();
+      renderSuppliersRegistry();
+      renderHistoryRegistry();
+    }
+
+    // Feature 2: Product Availability Render & Feature 4: Delete Node helper
+    function renderProductsRegistry(records = tableProducts) {
+      const body = document.getElementById('table-products');
+      body.innerHTML = records.map(p => `
+        <tr style="${!p.isActive ? 'opacity: 0.55;' : ''}">
+          <td style="color:var(--gold)">P-${p.id}</td>
+          <td><b>${p.name}</b></td>
+          <td>${p.category}</td>
+          <td>${p.brand}</td>
+          <td>₱${p.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+          <td style="text-align:center; font-weight:bold;">${p.qty}</td>
+          <td>
+            <label class="switch-label">
+              <input type="checkbox" ${p.isActive ? 'checked' : ''} onchange="toggleProductAvailability(${p.id}, this.checked)">
+              <div class="switch-box"></div>
+              <span>${p.isActive ? 'Active' : 'Inactive'}</span>
+            </label>
+          </td>
+          <td style="text-align:right;"><button class="btn-danger-link" onclick="deleteProductRecord(${p.id})">Purge</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Feature 3: Brand Management System Lifecycle Switch
+    function renderBrandsRegistry() {
+      const body = document.getElementById('table-brands');
+      body.innerHTML = tableBrands.map(b => `
+        <tr style="${!b.isActive ? 'opacity: 0.55;' : ''}">
+          <td style="color:var(--gold)">B-${b.id}</td>
+          <td><b>${b.name}</b></td>
+          <td>${b.type}</td>
+          <td>
+            <label class="switch-label">
+              <input type="checkbox" ${b.isActive ? 'checked' : ''} onchange="toggleBrandLifecycle(${b.id}, this.checked)">
+              <div class="switch-box"></div>
+              <span>${b.isActive ? 'Deployed' : 'Decommissioned'}</span>
+            </label>
+          </td>
+          <td style="text-align:right;"><button class="btn-danger-link" onclick="deleteBrandRecord(${b.id})">Purge</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSuppliersRegistry() {
+      const body = document.getElementById('table-suppliers');
+      body.innerHTML = tableSuppliers.map(s => `
+        <tr>
+          <td>S-${s.id}</td>
+          <td><b>${s.name}</b></td>
+          <td>${s.phone}</td>
+          <td>${s.email}</td>
+          <td style="text-align:right;"><button class="btn-danger-link" onclick="deleteSupplierRecord(${s.id})">Purge</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Feature 1: Status filtering: Stock-ins and outs processing logic
+    function renderHistoryRegistry() {
+      const body = document.getElementById('table-history');
+      const filterMode = document.getElementById('txFilter').value;
+
+      const itemsToRender = tableHistory.filter(h => {
+        if(filterMode === "ALL") return true;
+        return h.type === filterMode;
+      });
+
+      if(itemsToRender.length === 0) {
+        body.innerHTML = `<tr><td colspan="7" style="text-align:center; color:rgba(228,169,75,0.4); padding:30px;">No transaction entries matches selected ledger parameters.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = filteredData.map(prod => {
-        const structuralStatus = prod.qty < 10 ? 'status-low' : 'status-instock';
-        const labelStatus = prod.qty < 10 ? 'Low Stock' : 'In Stock';
-        
-        return `
-          <tr>
-            <td style="color: var(--gold); font-weight: 500;">P-${prod.id}</td>
-            <td style="font-family: system-ui, sans-serif; font-weight: 500; font-size:13px;">${prod.name}</td>
-            <td>${prod.category}</td>
-            <td>${prod.brand}</td>
-            <td style="font-weight: 500;">₱${prod.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-            <td style="font-weight: 500; text-align: center;">${prod.qty}</td>
-            <td style="color: rgba(245,238,216,0.6);">${prod.location}</td>
-            <td><span class="badge-status ${structuralStatus}">${labelStatus}</span></td>
-          </tr>
-        `;
-      }).join("");
-
-      updateMetrics(dbProducts);
+      body.innerHTML = itemsToRender.map(h => `
+        <tr>
+          <td>TX-${h.txId}</td>
+          <td>${h.productName}</td>
+          <td>${h.user}</td>
+          <td style="color:rgba(245,238,216,0.6)">${h.supplier}</td>
+          <td><span class="${h.type === 'IN' ? 'tx-in' : 'tx-out'}">${h.type === 'IN' ? '📈 INBOUND' : '📉 OUTBOUND'}</span></td>
+          <td><b>${h.quantity}</b></td>
+          <td style="color:rgba(245,238,216,0.4); font-size:11px;">${h.date}</td>
+        </tr>
+      `).join('');
     }
 
-    // Recalculate operational totals values live
-    function updateMetrics(items) {
-      document.getElementById("metricTotalSKU").textContent = items.length;
-      document.getElementById("metricTotalUnits").textContent = items.reduce((acc, current) => acc + current.qty, 0);
-      document.getElementById("metricLowStock").textContent = items.filter(i => i.qty < 10).length;
+    /* ─── State Management Mutation Nodes ─── */
+    function toggleProductAvailability(id, isChecked) {
+      const prod = tableProducts.find(p => p.id === id);
+      if(prod) {
+        prod.isActive = isChecked;
+        refreshInterfaceViews();
+      }
     }
 
-    // Live search tracking operations pipelines
-    function filterRegistry() {
-      const searchVal = document.getElementById("searchBar").value.toLowerCase();
-      const categoryVal = document.getElementById("categoryFilter").value;
-      const brandVal = document.getElementById("brandFilter").value;
-      const statusVal = document.querySelector('input[name="stockStatus"]:checked').value;
-
-      const records = dbProducts.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchVal);
-        const matchesCategory = (categoryVal === "ALL" || item.category === categoryVal);
-        const matchesBrand = (brandVal === "ALL" || item.brand === brandVal);
-        const matchesStatus = (statusVal === "ALL" || (statusVal === "LOW" && item.qty < 10));
-
-        return matchesSearch && matchesCategory && matchesBrand && matchesStatus;
-      });
-
-      renderRegistry(records);
+    function toggleBrandLifecycle(id, isChecked) {
+      const brand = tableBrands.find(b => b.id === id);
+      if(brand) {
+        brand.isActive = isChecked;
+        // Cascading control rules: If a brand is marked inactive, immediately turn down all products cataloged under it
+        if(!isChecked) {
+          tableProducts.forEach(p => {
+            if(p.brand === brand.name) p.isActive = false;
+          });
+        }
+        refreshInterfaceViews();
+      }
     }
 
-    // Forms Submission Handler: Create Product
-    function handleCreateProduct(e) {
+    /* Feature 4: Safe Explicit Deletion Operations Cascade Routines */
+    function deleteProductRecord(id) {
+      if(confirm("CRITICAL WARNING:\n\nYou are about to permanently clear this product spec file from memory. This change cannot be undone. Proceed?")) {
+        tableProducts = tableProducts.filter(p => p.id !== id);
+        refreshInterfaceViews();
+      }
+    }
+
+    function deleteBrandRecord(id) {
+      const brand = tableBrands.find(b => b.id === id);
+      if(!brand) return;
+
+      const dependencyCheck = tableProducts.some(p => p.brand === brand.name);
+      if(dependencyCheck) {
+        alert("Operation Blocked: Cannot delete brand entry while active catalog product specifications depend on its string namespace definition.");
+        return;
+      }
+
+      if(confirm(`Confirm deletion of manufacturer parameter: ${brand.name}?`)) {
+        tableBrands = tableBrands.filter(b => b.id !== id);
+        refreshInterfaceViews();
+      }
+    }
+
+    function deleteSupplierRecord(id) {
+      if(confirm("Confirm removal of this authorized supplier profile? This action breaks history lookups referencing this entity.")) {
+        tableSuppliers = tableSuppliers.filter(s => s.id !== id);
+        refreshInterfaceViews();
+      }
+    }
+
+    /* ─── Data Entry Submission Pipeline Nodes ─── */
+    function createNewProduct(e) {
       e.preventDefault();
-      
-      const newProduct = {
-        id: dbProducts.length ? Math.max(...dbProducts.map(p => p.id)) + 1 : 101,
-        name: document.getElementById("newProdName").value,
-        category: document.getElementById("newProdCategory").value,
-        brand: document.getElementById("newProdBrand").value,
-        price: parseFloat(document.getElementById("newProdPrice").value),
-        qty: parseInt(document.getElementById("newProdQty").value),
-        location: document.getElementById("newProdLocation").value,
-        accurate: true
-      };
-
-      dbProducts.push(newProduct);
+      tableProducts.push({
+        id: tableProducts.length ? Math.max(...tableProducts.map(p => p.id)) + 1 : 101,
+        name: document.getElementById('p-name').value,
+        category: document.getElementById('p-cat').value,
+        brand: document.getElementById('p-brand-select').value,
+        price: parseFloat(document.getElementById('p-price').value),
+        qty: parseInt(document.getElementById('p-qty').value),
+        location: document.getElementById('p-loc').value,
+        isActive: true
+      });
       e.target.reset();
       toggleModal('productModal', false);
-      renderRegistry();
+      refreshInterfaceViews();
     }
 
-    // Forms Submission Handler: Audit Stock-In/Out Transactions
-    function handleStockAdjustment(e) {
+    function createNewBrand(e) {
       e.preventDefault();
-      
-      const targetId = parseInt(document.getElementById("adjTargetProduct").value);
-      const adjType = document.getElementById("adjType").value;
-      const units = parseInt(document.getElementById("adjQty").value);
+      tableBrands.push({
+        id: tableBrands.length ? Math.max(...tableBrands.map(b => b.id)) + 1 : 301,
+        name: document.getElementById('b-name').value,
+        type: document.getElementById('b-type').value,
+        isActive: true
+      });
+      e.target.reset();
+      toggleModal('brandModal', false);
+      refreshInterfaceViews();
+    }
 
-      const product = dbProducts.find(p => p.id === targetId);
-      if (product) {
-        if (adjType === "IN") {
-          product.qty += units;
-        } else if (adjType === "OUT") {
-          if(product.qty < units) {
-            alert(`Insufficient Stock Registry Volume! Current available quantity: ${product.qty}`);
-            return;
-          }
-          product.qty -= units;
-        }
-        
-        e.target.reset();
-        toggleModal('stockModal', false);
-        renderRegistry();
+    function createNewSupplier(e) {
+      e.preventDefault();
+      tableSuppliers.push({
+        id: tableSuppliers.length ? Math.max(...tableSuppliers.map(s => s.id)) + 1 : 501,
+        name: document.getElementById('s-name').value,
+        phone: document.getElementById('s-phone').value,
+        email: document.getElementById('s-email').value
+      });
+      e.target.reset();
+      toggleModal('supplierModal', false);
+      refreshInterfaceViews();
+    }
+
+    function executeAdjustment(e) {
+      e.preventDefault();
+      const pId = parseInt(document.getElementById('adj-product').value);
+      const sId = parseInt(document.getElementById('adj-supplier').value);
+      const type = document.getElementById('adj-type').value;
+      const val = parseInt(document.getElementById('adj-qty').value);
+
+      const prod = tableProducts.find(p => p.id === pId);
+      const vendor = tableSuppliers.find(s => s.id === sId);
+
+      if(type === "OUT" && prod.qty < val) {
+        alert("Operation Aborted: Insufficient stock assets available to perform specified balance disbursal.");
+        return;
       }
+
+      prod.qty += (type === "IN" ? val : -val);
+
+      tableHistory.unshift({
+        txId: tableHistory.length ? Math.max(...tableHistory.map(h => h.txId)) + 1 : 9001,
+        productName: prod.name,
+        user: "Admin (Karlo)",
+        supplier: vendor ? vendor.name : "N/A (Retail Terminal Outbound Sale)",
+        type: type,
+        quantity: val,
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16)
+      });
+
+      e.target.reset();
+      toggleModal('adjustmentModal', false);
+      refreshInterfaceViews();
+    }
+
+    function executeGlobalFilters() {
+      const search = document.getElementById('globalSearch').value.toLowerCase();
+      const category = document.getElementById('categorySelect').value;
+
+      const filtered = tableProducts.filter(p => {
+        const textMatch = p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search);
+        const catMatch = category === "ALL" || p.category === category;
+        return textMatch && catMatch;
+      });
+
+      renderProductsRegistry(filtered);
     }
   </script>
 </body>
