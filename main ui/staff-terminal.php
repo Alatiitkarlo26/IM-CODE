@@ -360,6 +360,13 @@
   </div>
 
   <header class="top-bar">
+    <?php
+      // You can now write queries anywhere inside the HTML body!
+      // Example: Testing if the connection works
+      if($conn) {
+          echo "<p style='color: green;'>Successfully connected to the database!</p>";
+      }
+    ?>
     <div class="logo-row">
       <svg class="logo-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="18" y="2" width="8" height="28" rx="4" fill="#6b2d1a" stroke="#c8812a" stroke-width="1"/>

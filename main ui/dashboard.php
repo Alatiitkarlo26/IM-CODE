@@ -160,6 +160,13 @@
   <div class="bg-strings"><div class="bg-string"></div><div class="bg-string"></div><div class="bg-string"></div></div>
 
   <header class="top-bar">
+    <?php
+      // You can now write queries anywhere inside the HTML body!
+      // Example: Testing if the connection works
+      if($conn) {
+          echo "<p style='color: green;'>Successfully connected to the database!</p>";
+      }
+    ?>
     <div class="logo-row">
       <div class="brand">
         <span class="brand-name">Fretboard</span>

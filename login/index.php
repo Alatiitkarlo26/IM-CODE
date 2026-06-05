@@ -1,3 +1,8 @@
+<?php
+  // Go up one folder, then into the db folder to find the connection script
+  require_once '../db/db_connection.php'; 
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -291,6 +296,7 @@
 </head>
 <body>
 
+
   <div class="bg"></div>
 
   <div class="strings">
@@ -318,7 +324,13 @@
   <div class="inlay"></div>
 
   <div class="card">
-
+<?php
+      // You can now write queries anywhere inside the HTML body!
+      // Example: Testing if the connection works
+      if($conn) {
+          echo "<p style='color: green;'>Successfully connected to the database!</p>";
+      }
+    ?>
     <div class="logo-row">
       <!-- Guitar headstock SVG icon -->
       <svg class="logo-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
