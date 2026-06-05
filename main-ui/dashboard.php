@@ -1,3 +1,7 @@
+<?php
+  // Go up one folder, then into the db folder to find the connection script
+  require_once '../db/db_connection.php'; 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
