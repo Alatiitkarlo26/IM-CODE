@@ -1,8 +1,51 @@
 <?php
+  // Start the session to keep track of logged-in users
+  session_start();
+  
   // Go up one folder, then into the db folder to find the connection script
   require_once '../db/db_connection.php'; 
-?>
 
+  $error_msg = '';
+
+  // Check if the form was submitted
+  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
+      $username = trim($_POST['username']);
+      $password = trim($_POST['password']);
+
+      if (!empty($username) && !empty($password)) {
+          // Prepare statement to prevent SQL injection
+          $stmt = $conn->prepare("SELECT user_id, password, role_id FROM tbl_users WHERE username = ?");
+          $stmt->bind_param("s", $username);
+          $stmt->execute();
+          $result = $stmt->get_result();
+
+          if ($result->num_rows === 1) {
+              $user = $result->fetch_assoc();
+
+              // Check password. 
+              // Note: If you stored passwords as plain text, this checks exactly that.
+              // If you used password_hash() when registering users, replace the condition with: password_verify($password, $user['password'])
+              if ($password === $user['password']) {
+                  
+                  // Store user data in session variables
+                  $_SESSION['user_id'] = $user['user_id'];
+                  $_SESSION['role_id'] = $user['role_id'];
+
+                  // Jump to the dashboard page
+                  header("Location: ../main-ui/dashboard.php");
+                  exit();
+              } else {
+                  $error_msg = "Invalid username or password.";
+              }
+          } else {
+              $error_msg = "Invalid username or password.";
+          }
+          $stmt->close();
+      } else {
+          $error_msg = "Please enter both username and password.";
+      }
+  }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,6 +214,19 @@
       margin-bottom: 36px;
     }
 
+    /* ─── Error Message ─── */
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 11px;
+      text-align: center;
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+      background: rgba(255, 107, 107, 0.1);
+      padding: 8px;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 107, 107, 0.2);
+    }
+
     /* ─── Form ─── */
     .field {
       margin-bottom: 22px;
@@ -218,7 +274,6 @@
     input:focus + svg,
     .input-wrap:focus-within svg { color: rgba(228,169,75,0.7); }
 
-    
     .input-wrap input { order: 0; }
     .input-wrap svg   { order: 1; }
 
@@ -296,7 +351,6 @@
 </head>
 <body>
 
-
   <div class="bg"></div>
 
   <div class="strings">
@@ -324,21 +378,13 @@
   <div class="inlay"></div>
 
   <div class="card">
-<?php
-      // You can now write queries anywhere inside the HTML body!
-      // Example: Testing if the connection works
-      if($conn) {
-          echo "<p style='color: green;'>Successfully connected to the database!</p>";
-      }
-    ?>
+    
     <div class="logo-row">
-      <!-- Guitar headstock SVG icon -->
       <svg class="logo-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="18" y="2" width="8" height="28" rx="4" fill="#6b2d1a" stroke="#c8812a" stroke-width="1"/>
         <rect x="20" y="26" width="4" height="16" rx="2" fill="#3b1a0e" stroke="#c8812a" stroke-width="0.8"/>
         <circle cx="22" cy="40" r="3" fill="#c8812a" opacity="0.8"/>
         <rect x="13" y="6" width="18" height="3" rx="1.5" fill="#e4a94b" opacity="0.7"/>
-        <!-- Tuning pegs -->
         <circle cx="12" cy="10" r="3" fill="#c8812a" stroke="#e4a94b" stroke-width="0.8"/>
         <circle cx="32" cy="10" r="3" fill="#c8812a" stroke="#e4a94b" stroke-width="0.8"/>
         <circle cx="12" cy="18" r="3" fill="#c8812a" stroke="#e4a94b" stroke-width="0.8"/>
@@ -352,12 +398,20 @@
 
     <div class="divider"></div>
 
-    <form onsubmit="handleLogin(event)">
+    <?php 
+      // Display error message if there is one
+      if (!empty($error_msg)) {
+          echo "<div class='error-msg'>" . htmlspecialchars($error_msg) . "</div>";
+      }
+    ?>
+
+    <form method="POST" action="">
       <div class="field">
         <label for="username">Username</label>
         <div class="input-wrap">
           <input
             id="username"
+            name="username"
             type="text"
             placeholder="username"
             autocomplete="username"
@@ -375,6 +429,7 @@
         <div class="input-wrap">
           <input
             id="password"
+            name="password"
             type="password"
             placeholder="••••••••"
             autocomplete="current-password"
@@ -388,7 +443,7 @@
         <a href="#" class="forgot">Forgot password?</a>
       </div>
 
-      <button type="submit" class="btn">Sign In to Inventory</button>
+      <button type="submit" name="login" class="btn">Sign In to Inventory</button>
     </form>
 
     <div class="card-footer">
@@ -398,18 +453,6 @@
   </div>
 
   <script>
-    function handleLogin(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('.btn');
-      btn.textContent = 'Tuning in…';
-      btn.style.opacity = '0.7';
-      setTimeout(() => {
-        btn.textContent = 'Sign In to Inventory';
-        btn.style.opacity = '';
-        alert('Login submitted! Connect to your backend to authenticate.');
-      }, 1600);
-    }
-
     // Subtle string shimmer on hover
     document.querySelectorAll('.string').forEach((s, i) => {
       s.addEventListener('mouseenter', () => {
