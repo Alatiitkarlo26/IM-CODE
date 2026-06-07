@@ -116,9 +116,19 @@
     .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--gold); line-height: 1; }
     .brand-sub { font-size: 8px; color: rgba(228,169,75,0.45); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 3px; }
 
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
     .role-badge {
       background: rgba(228, 169, 75, 0.08); border: 1px solid rgba(228, 169, 75, 0.3);
-      color: var(--gold); padding: 3px 8px; border-radius: 3px; font-size: 10px; text-transform: uppercase;
+      color: var(--gold); padding: 3px 8px; border-radius: 3px; font-size: 10px; text-transform: uppercase; margin-top: 2px;
     }
 
     .nav-tabs { display: flex; background: rgba(15, 7, 3, 0.6); border-bottom: 1px solid rgba(228,169,75,0.12); padding: 0 30px; }
@@ -156,8 +166,22 @@
       padding: 10px 18px; background: linear-gradient(135deg, var(--amber), var(--rosewood) 80%);
       border: none; border-radius: 3px; color: var(--cream); font-family: inherit; font-size: 11px;
       letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 15px rgba(200,129,42,0.15);
+      text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
     }
     .btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid rgba(228,169,75,0.25); box-shadow: none; }
+    
+    .btn-logout {
+      padding: 6px 12px;
+      font-size: 10px;
+      border-color: rgba(239, 68, 68, 0.4);
+      color: var(--danger);
+      transition: all 0.2s ease;
+    }
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--danger);
+      color: #fff;
+    }
 
     .table-container { background: var(--dark-card); border: 1px solid rgba(228,169,75,0.22); border-radius: 4px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
@@ -203,16 +227,19 @@
       </div>
     </div>
     <div class="user-profile">
-      <span>Jian Karlo H. Alatiit</span>
-      <span class="role-badge">Super Admin</span>
+      <div class="user-details">
+        <span>Jian Karlo H. Alatiit</span>
+        <span class="role-badge">Super Admin</span>
+      </div>
+      <a href="logout.php" class="btn btn-secondary btn-logout">🚪 Sign Out</a>
     </div>
   </header>
 
   <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchView('products')">🎸 Products Matrix</button>
-    <button class="tab-btn" onclick="switchView('brands')">🏷️ Brand Lifecycle</button>
-    <button class="tab-btn" onclick="switchView('suppliers')">📦 Suppliers Profiles</button>
-    <button class="tab-btn" onclick="switchView('history')">📜 Transaction Ledger</button>
+    <button class="tab-btn active" onclick="switchView('products', event)">🎸 Products Matrix</button>
+    <button class="tab-btn" onclick="switchView('brands', event)">🏷️ Brand Lifecycle</button>
+    <button class="tab-btn" onclick="switchView('suppliers', event)">📦 Suppliers Profiles</button>
+    <button class="tab-btn" onclick="switchView('history', event)">📜 Transaction Ledger</button>
   </nav>
 
   <div class="workspace">
@@ -397,10 +424,10 @@
       refreshInterfaceViews();
     });
 
-    function switchView(viewName) {
+    function switchView(viewName, e) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
-      event.target.classList.add('active');
+      e.target.classList.add('active');
       document.getElementById(`pane-${viewName}`).classList.add('active');
     }
 
@@ -563,7 +590,7 @@
       const payload = {
         action: 'EXECUTE_ADJUSTMENT',
         product_id: parseInt(document.getElementById('adj-product').value),
-        stock_type: document.getElementById('adj-type').value,
+        type: document.getElementById('adj-type').value,
         quantity: parseInt(document.getElementById('adj-qty').value)
       };
 
