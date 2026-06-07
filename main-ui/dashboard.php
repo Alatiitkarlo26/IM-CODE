@@ -165,10 +165,8 @@
 
   <header class="top-bar">
     <?php
-      // You can now write queries anywhere inside the HTML body!
-      // Example: Testing if the connection works
       if($conn) {
-          echo "<p style='color: green;'>Successfully connected to the database!</p>";
+          echo "<p style='color: #10b981; font-size: 11px; letter-spacing:0.05em;'>CONNECTIVITY STATE: NODE ONLINE</p>";
       }
     ?>
     <div class="logo-row">
@@ -223,7 +221,7 @@
         <section class="table-container">
           <table>
             <thead>
-              <tr><th>SKU ID</th><th>Model Name</th><th>Category Line</th><th>Brand Origin</th><th>Price</th><th>Stock</th><th>Operational State</th><th style="text-align:right;">Data Controls</th></tr>
+              <tr><th>SKU ID</th><th>Model Name</th><th>Category Line</th><th>Brand Origin</th><th>Price</th><th>Stock</th><th>Stock Zone</th><th>Operational State</th><th style="text-align:right;">Data Controls</th></tr>
             </thead>
             <tbody id="table-products"></tbody>
           </table>
@@ -343,7 +341,6 @@
   </div>
 
   <script>
-    // State Architecture Mapped to Document Structural Definitions
     let tableProducts = [
       { id: 101, name: "Affinity Series Stratocaster", category: "Guitars", brand: "Fender", price: 18500.00, qty: 14, location: "Rack A-1", isActive: true },
       { id: 102, name: "Les Paul Standard '60s", category: "Guitars", brand: "Gibson", price: 145000.00, qty: 3, location: "Vault Display", isActive: true },
@@ -389,7 +386,6 @@
     }
 
     function setupAdjustmentDropdowns() {
-      // Filter out products whose brand is inactive to prevent transactions on discontinued brands
       const availableProducts = tableProducts.filter(p => {
         const parentBrand = tableBrands.find(b => b.name === p.brand);
         return parentBrand ? parentBrand.isActive : true;
@@ -400,12 +396,10 @@
     }
 
     function populateBrandDropdownMenu() {
-      // Dynamic rendering ensures you can only select active brands when declaring new items
       const activeBrands = tableBrands.filter(b => b.isActive);
       document.getElementById('p-brand-select').innerHTML = activeBrands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
     }
 
-    /* ─── Global State Rendering Pipelines ─── */
     function refreshInterfaceViews() {
       renderProductsRegistry();
       renderBrandsRegistry();
@@ -413,7 +407,7 @@
       renderHistoryRegistry();
     }
 
-    // Feature 2: Product Availability Render & Feature 4: Delete Node helper
+    // Updated view logic to inject dynamic location values into table body rows
     function renderProductsRegistry(records = tableProducts) {
       const body = document.getElementById('table-products');
       body.innerHTML = records.map(p => `
@@ -424,6 +418,7 @@
           <td>${p.brand}</td>
           <td>₱${p.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
           <td style="text-align:center; font-weight:bold;">${p.qty}</td>
+          <td style="color:rgba(245,238,216,0.7); font-style:italic;">${p.location}</td>
           <td>
             <label class="switch-label">
               <input type="checkbox" ${p.isActive ? 'checked' : ''} onchange="toggleProductAvailability(${p.id}, this.checked)">
@@ -436,7 +431,6 @@
       `).join('');
     }
 
-    // Feature 3: Brand Management System Lifecycle Switch
     function renderBrandsRegistry() {
       const body = document.getElementById('table-brands');
       body.innerHTML = tableBrands.map(b => `
@@ -469,7 +463,6 @@
       `).join('');
     }
 
-    // Feature 1: Status filtering: Stock-ins and outs processing logic
     function renderHistoryRegistry() {
       const body = document.getElementById('table-history');
       const filterMode = document.getElementById('txFilter').value;
@@ -497,7 +490,6 @@
       `).join('');
     }
 
-    /* ─── State Management Mutation Nodes ─── */
     function toggleProductAvailability(id, isChecked) {
       const prod = tableProducts.find(p => p.id === id);
       if(prod) {
@@ -510,7 +502,6 @@
       const brand = tableBrands.find(b => b.id === id);
       if(brand) {
         brand.isActive = isChecked;
-        // Cascading control rules: If a brand is marked inactive, immediately turn down all products cataloged under it
         if(!isChecked) {
           tableProducts.forEach(p => {
             if(p.brand === brand.name) p.isActive = false;
@@ -520,7 +511,6 @@
       }
     }
 
-    /* Feature 4: Safe Explicit Deletion Operations Cascade Routines */
     function deleteProductRecord(id) {
       if(confirm("CRITICAL WARNING:\n\nYou are about to permanently clear this product spec file from memory. This change cannot be undone. Proceed?")) {
         tableProducts = tableProducts.filter(p => p.id !== id);
@@ -551,7 +541,6 @@
       }
     }
 
-    /* ─── Data Entry Submission Pipeline Nodes ─── */
     function createNewProduct(e) {
       e.preventDefault();
       tableProducts.push({
