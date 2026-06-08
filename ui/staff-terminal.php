@@ -3,13 +3,16 @@
   session_start();
 
   // Use absolute directory magic constant to safely include the db layer line
-require_once __DIR__ . '/../db/db_connection.php';
+  require_once __DIR__ . '/../db/db_connection.php';
 
   // Security Access Control Layer — Ensure only authenticated Staff can view this terminal
   if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Staff') {
       header("Location: index.php");
       exit();
   }
+
+  // Get active current user session token ID to filter productivity if needed
+  $current_user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
 
   // ─── PHP BACKEND INITIAL RETRIEVAL PIPELINES ───
   // Fetch Active Categories for Filter Dropdown
@@ -45,6 +48,20 @@ require_once __DIR__ . '/../db/db_connection.php';
               $row['quantity_on_hand'] = (int)$row['quantity_on_hand'];
               $productsArr[] = $row;
           }
+      }
+  }
+
+  // Fetch Employee Productivity Metrics (Query 10)
+  $metricsArr = [];
+  $metricsQuery = "SELECT u.full_name, COUNT(sh.stockHistory_id) AS total_actions_performed
+                   FROM tbl_users u
+                   INNER JOIN tbl_stock_history sh ON u.user_id = sh.user_id
+                   GROUP BY u.user_id, u.full_name
+                   HAVING total_actions_performed > 0";
+  $metricsResult = mysqli_query($conn, $metricsQuery);
+  if ($metricsResult) {
+      while ($row = mysqli_fetch_assoc($metricsResult)) {
+          $metricsArr[] = $row;
       }
   }
 ?>
@@ -181,7 +198,8 @@ require_once __DIR__ . '/../db/db_connection.php';
     .content-canvas { padding: 35px; display: flex; flex-direction: column; gap: 30px; }
     .action-row { display: flex; justify-content: space-between; align-items: center; }
     .panel-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--parchment); }
-    
+    .btn-group { display: flex; gap: 12px; }
+
     .btn {
       padding: 10px 18px; background: linear-gradient(135deg, var(--amber), var(--rosewood) 80%);
       border: none; border-radius: 3px; color: var(--cream); font-family: inherit; font-size: 11px;
@@ -200,6 +218,7 @@ require_once __DIR__ . '/../db/db_connection.php';
 
     .status-high { color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 3px; font-size: 11px; }
     .status-low { color: var(--danger); background: rgba(239, 68, 68, 0.1); padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; }
+    .metric-badge { color: var(--gold); font-weight: bold; font-size: 13px; }
 
     /* Modal Styling */
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 5, 3, 0.85); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
@@ -282,7 +301,10 @@ require_once __DIR__ . '/../db/db_connection.php';
     <main class="content-canvas">
       <section class="action-row">
         <h2 class="panel-title">Active Instrument Floor Catalog</h2>
-        <button class="btn" style="background: linear-gradient(135deg, #ef4444, #6b2d1a);" onclick="toggleModal('stockOutModal', true)">📉 Log Stock Out Disbursal</button>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="toggleModal('metricsModal', true)">👥 View Productivity Metrics</button>
+          <button class="btn" style="background: linear-gradient(135deg, #ef4444, #6b2d1a);" onclick="toggleModal('stockOutModal', true)">📉 Log Stock Out Disbursal</button>
+        </div>
       </section>
 
       <section class="table-container">
@@ -321,6 +343,35 @@ require_once __DIR__ . '/../db/db_connection.php';
     </div>
   </div>
 
+  <div id="metricsModal" class="modal-overlay">
+    <div class="modal-card" style="width: 520px; border-color: var(--amber);">
+      <div class="modal-header"><h3>Employee Productivity Leaderboard</h3><button class="modal-close" onclick="toggleModal('metricsModal', false)">&times;</button></div>
+      <div class="table-container" style="max-height: 320px; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee Full Name</th>
+              <th style="text-align: right; padding-right: 25px;">Actions Logged</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if(empty($metricsArr)): ?>
+              <tr><td colspan="2" style="text-align:center; color:rgba(228,169,75,0.4); padding:20px;">No transaction history metrics found.</td></tr>
+            <?php else: ?>
+              <?php foreach($metricsArr as $metric): ?>
+                <tr>
+                  <td><b><?php echo htmlspecialchars($metric['full_name']); ?></b></td>
+                  <td style="text-align: right; padding-right: 25px;"><span class="metric-badge"><?php echo (int)$metric['total_actions_performed']; ?> entries</span></td>
+                </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-secondary" style="width: 100%; margin-top: 20px;" onclick="toggleModal('metricsModal', false)">Dismiss Window</button>
+    </div>
+  </div>
+
   <script>
     // Live client data state mirror
     let dbProducts = <?php echo json_encode($productsArr); ?>;
@@ -333,7 +384,7 @@ require_once __DIR__ . '/../db/db_connection.php';
       const modal = document.getElementById(id);
       if(open) {
         modal.classList.add('active');
-        setupStockOutDropdown();
+        if(id === 'stockOutModal') setupStockOutDropdown();
       } else {
         modal.classList.remove('active');
       }

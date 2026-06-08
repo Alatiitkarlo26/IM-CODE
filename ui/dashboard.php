@@ -44,6 +44,20 @@
   while ($row = mysqli_fetch_assoc($histResult)) {
       $historyArr[] = $row;
   }
+
+  // Fetch Employee Productivity Metrics (Query 10)
+  $metricsArr = [];
+  $metricsQuery = "SELECT u.full_name, COUNT(sh.stockHistory_id) AS total_actions_performed
+                   FROM tbl_users u
+                   INNER JOIN tbl_stock_history sh ON u.user_id = sh.user_id
+                   GROUP BY u.user_id, u.full_name
+                   HAVING total_actions_performed > 0";
+  $metricsResult = mysqli_query($conn, $metricsQuery);
+  if ($metricsResult) {
+      while ($row = mysqli_fetch_assoc($metricsResult)) {
+          $metricsArr[] = $row;
+      }
+  }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -193,6 +207,7 @@
     .status-low { color: var(--danger); background: rgba(239, 68, 68, 0.1); padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; }
     .tx-in { color: var(--success); font-weight: bold; }
     .tx-out { color: var(--danger); font-weight: bold; }
+    .metric-badge { color: var(--gold); font-weight: bold; font-size: 13px; }
 
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 5, 3, 0.85); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
@@ -240,6 +255,7 @@
     <button class="tab-btn" onclick="switchView('brands', event)">🏷️ Brand Lifecycle</button>
     <button class="tab-btn" onclick="switchView('suppliers', event)">📦 Suppliers Profiles</button>
     <button class="tab-btn" onclick="switchView('history', event)">📜 Transaction Ledger</button>
+    <button class="tab-btn" onclick="switchView('metrics', event)">👥 Employee Metrics</button>
   </nav>
 
   <div class="workspace">
@@ -351,6 +367,35 @@
               <tr><th>Log-ID</th><th>Target Product</th><th>Authorized User</th><th>Ledger State Direction</th><th>Unit Delta</th><th>Timestamp Logged</th></tr>
             </thead>
             <tbody id="table-history"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <div id="pane-metrics" class="view-pane">
+        <section class="action-row">
+          <h2 class="panel-title">Employee Productivity Matrix</h2>
+          <span style="font-size: 11px; color: rgba(228,169,75,0.65);">System Actions Auditing Profile Summary</span>
+        </section>
+        <section class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Full Name</th>
+                <th style="text-align: right; padding-right: 40px;">Total Actions Performed</th>
+              </tr>
+            </thead>
+            <tbody id="table-metrics">
+              <?php if(empty($metricsArr)): ?>
+                <tr><td colspan="2" style="text-align:center; color:rgba(228,169,75,0.4); padding:30px;">No operational transactions linked to an active user account yet.</td></tr>
+              <?php else: ?>
+                <?php foreach($metricsArr as $metric): ?>
+                  <tr>
+                    <td><b><?php echo htmlspecialchars($metric['full_name']); ?></b></td>
+                    <td style="text-align: right; padding-right: 40px;"><span class="metric-badge"><?php echo (int)$metric['total_actions_performed']; ?> entries</span></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </tbody>
           </table>
         </section>
       </div>
