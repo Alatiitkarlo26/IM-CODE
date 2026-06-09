@@ -64,7 +64,7 @@ try {
             echo json_encode(['status' => 'success', 'message' => 'Manufacturer entity initialized and operational nodes established.']);
             break;
 
-        case 'EXECUTE_ADJUSTMENT':
+      case 'EXECUTE_ADJUSTMENT':
             $productId = (int)$payload['product_id'];
             $type = trim($payload['type']); // Verified matching key
             $qty = (int)$payload['quantity'];
@@ -107,9 +107,29 @@ try {
             $updateStmt->execute();
             $updateStmt->close();
 
+            // ─── NEW FEATURE LAYER: DYNAMIC IS_AVAILABLE STATUS FLIPPER ───
+            // Fetch the updated quantity directly from the database to see the final calculation result
+            $finalCheckStmt = $conn->prepare("SELECT quantity_on_hand FROM tbl_products WHERE product_id = ?");
+            $finalCheckStmt->bind_param("i", $productId);
+            $finalCheckStmt->execute();
+            $finalResult = $finalCheckStmt->get_result()->fetch_assoc();
+            $finalCheckStmt->close();
+
+            if ($finalResult) {
+                $newQuantity = (int)$finalResult['quantity_on_hand'];
+                // If quantity drops to 0, set availability flag to 0. Otherwise, ensure it is 1.
+                $isAvailableFlag = ($newQuantity === 0) ? 0 : 1;
+
+                $availabilityStmt = $conn->prepare("UPDATE tbl_products SET is_available = ? WHERE product_id = ?");
+                $availabilityStmt->bind_param("ii", $isAvailableFlag, $productId);
+                $availabilityStmt->execute();
+                $availabilityStmt->close();
+            }
+            // ──────────────────────────────────────────────────────────────
+
             // Commit safely executed ledger changes
             $conn->commit();
-            echo json_encode(['status' => 'success', 'message' => 'Stock history ledger updated and database adjustments recorded successfully.']);
+            echo json_encode(['status' => 'success', 'message' => 'Stock history ledger updated and database availability flags recorded successfully.']);
             break;
 
         default:
