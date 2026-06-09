@@ -240,7 +240,7 @@
   <div class="bg-strings"><div class="bg-string"></div><div class="bg-string"></div><div class="bg-string"></div></div>
 
   <header class="top-bar">
-    <p style='color: #10b981; font-size: 11px; letter-spacing:0.05em;'>TERMINAL MODE: STAFF OPERATION MATRIX</p>
+    <!-- <p style='color: #10b981; font-size: 11px; letter-spacing:0.05em;'>TERMINAL MODE: STAFF OPERATION MATRIX</p> -->
     <div class="logo-row">
       <div class="brand">
         <span class="brand-name">Fretboard</span>

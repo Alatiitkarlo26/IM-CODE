@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 // Clean input formatting string variations (e.g., matching 1/admin/Admin)
                 $detected_role = trim(strtolower((string)$detected_role));
-
+  
                 // 3. Multi-Role Gateway Routing Engine (Saves explicitly standardized session keys)
                 if ($detected_role === 'admin' || $detected_role === 'super admin' || $detected_role === '1') {
                     $_SESSION['role'] = 'Admin';
