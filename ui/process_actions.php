@@ -37,6 +37,8 @@ try {
                 throw new Exception("All core product specification fields are required.");
             }
 
+         // Query 7: Provision a New Product Asset Records a newly registered instrument into the active inventory database, 
+         // assigning its core metadata, pricing, and physical location.
             $stmt = $conn->prepare("INSERT INTO tbl_products (product_name, category_id, brand_id, unit_price, quantity_on_hand, location) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("siidis", $name, $catId, $brandId, $price, $qty, $location);
             $stmt->execute();
@@ -55,7 +57,7 @@ try {
                 throw new Exception("All manufacturer corporate fields are required.");
             }
 
-            // Maps parameters to your integrated Brand/Supplier consolidated fields
+        //  Query 8: Establish a New Brand Profile to the brand directory, storing their corporate contact information.
             $stmt = $conn->prepare("INSERT INTO tbl_brands (brand_name, phone, email, address) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("ssss", $brandName, $phone, $email, $address);
             $stmt->execute();
@@ -93,12 +95,16 @@ try {
             }
 
             // STEP A: Insert entry into transaction log ledger
+            // Query 9: Record Audit Ledger Entry Permanently logs a stock action(whether it’s Stock-in or Stock-out) linked to the user who authorized it.
             $logStmt = $conn->prepare("INSERT INTO tbl_stock_history (product_id, user_id, stock_type, quantity) VALUES (?, ?, ?, ?)");
             $logStmt->bind_param("iisi", $productId, $userId, $type, $qty);
             $logStmt->execute();
             $logStmt->close();
 
             // STEP B: Perform dynamic balancing adjustment updates against production metrics
+            // Query 10: Dynamic Stock Balance Adjustment (UPDATE) While not an INSERT query, 
+            // this critical UPDATE runs in the same transaction block as Query 9 to actively 
+            // adjust the total units of a specific product based on the transaction type.
             if ($type === 'Stock-In') {
                 $updateStmt = $conn->prepare("UPDATE tbl_products SET quantity_on_hand = quantity_on_hand + ? WHERE product_id = ?");
             } else {

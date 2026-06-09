@@ -47,7 +47,7 @@
       $historyArr[] = $row;
   }
 
-  // Fetch Employee Productivity Metrics (Query 10)
+  // Query 6: Count how many inventory transactions each employee has performed
   $metricsArr = [];
   $metricsQuery = "SELECT u.full_name, COUNT(sh.stockHistory_id) AS total_actions_performed
                    FROM tbl_users u
