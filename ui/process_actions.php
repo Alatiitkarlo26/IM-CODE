@@ -77,6 +77,7 @@ try {
             $conn->begin_transaction();
 
             // Validate item availability state prior to stock alterations
+            //QUERY 3 : Concurrency Validation 
             $checkStmt = $conn->prepare("SELECT quantity_on_hand FROM tbl_products WHERE product_id = ? FOR UPDATE");
             $checkStmt->bind_param("i", $productId);
             $checkStmt->execute();

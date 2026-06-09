@@ -5,7 +5,7 @@
   // ─── PHP BACKEND INITIAL RETRIEVAL PIPELINES ───
   // Fetch Active Categories
   $categoriesArr = [];
-  $catResult = mysqli_query($conn, "SELECT * FROM tbl_categories");
+  $catResult = mysqli_query($conn, "SELECT * FROM tbl_categories"); //QUERY 2:  Fetch Active System Categories
   while ($row = mysqli_fetch_assoc($catResult)) {
       $categoriesArr[] = $row;
   }
@@ -18,6 +18,7 @@
   }
 
   // Fetch Products with Relational Parent Joins
+  //QUERY 4: The Master Product Matrix
   $productsArr = [];
   $prodQuery = "SELECT p.*, c.category_name, b.brand_name 
                 FROM tbl_products p
@@ -34,6 +35,7 @@
   }
 
   // Fetch System Transaction History Ledger Rows
+  //QUERY 5: System Transaction History Ledger 
   $historyArr = [];
   $histQuery = "SELECT h.*, p.product_name, u.full_name 
                 FROM tbl_stock_history h
