@@ -1,10 +1,9 @@
 <?php
-
   require_once '../db/db_connection.php'; 
 
   // Fetch Active Categories
   $categoriesArr = [];
-  $catResult = mysqli_query($conn, "SELECT * FROM tbl_categories"); //QUERY 2:  Fetch Active System Categories
+  $catResult = mysqli_query($conn, "SELECT * FROM tbl_categories"); 
   while ($row = mysqli_fetch_assoc($catResult)) {
       $categoriesArr[] = $row;
   }
@@ -17,7 +16,6 @@
   }
 
   // Fetch Products with Relational Parent Joins
-  //QUERY 4: The Master Product Matrix
   $productsArr = [];
   $prodQuery = "SELECT p.*, c.category_name, b.brand_name 
                 FROM tbl_products p
@@ -34,7 +32,6 @@
   }
 
   // Fetch System Transaction History Ledger Rows
-  //QUERY 5: System Transaction History Ledger 
   $historyArr = [];
   $histQuery = "SELECT h.*, p.product_name, u.full_name 
                 FROM tbl_stock_history h
@@ -46,7 +43,7 @@
       $historyArr[] = $row;
   }
 
-// Query 6: Count how many inventory transactions each employee has performed (Including new users with 0)
+  // Fetch Employee Productivity Metrics
   $metricsArr = [];
   $metricsQuery = "SELECT u.full_name, COUNT(sh.stockHistory_id) AS total_actions_performed
                    FROM tbl_users u
@@ -94,7 +91,6 @@
       flex-direction: column;
     }
 
-    /* Fine Premium Wood Textured Backplane Layouts */
     .bg {
       position: fixed;
       inset: 0;
@@ -131,16 +127,8 @@
     .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--gold); line-height: 1; }
     .brand-sub { font-size: 8px; color: rgba(228,169,75,0.45); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 3px; }
 
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .user-details {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
+    .user-profile { display: flex; align-items: center; gap: 16px; }
+    .user-details { display: flex; flex-direction: column; align-items: flex-end; }
     .role-badge {
       background: rgba(228, 169, 75, 0.08); border: 1px solid rgba(228, 169, 75, 0.3);
       color: var(--gold); padding: 3px 8px; border-radius: 3px; font-size: 10px; text-transform: uppercase; margin-top: 2px;
@@ -185,18 +173,14 @@
     }
     .btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid rgba(228,169,75,0.25); box-shadow: none; }
     
-    .btn-logout {
-      padding: 6px 12px;
-      font-size: 10px;
-      border-color: rgba(239, 68, 68, 0.4);
-      color: var(--danger);
-      transition: all 0.2s ease;
-    }
-    .btn-logout:hover {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: var(--danger);
-      color: #fff;
-    }
+    .btn-table-action { padding: 4px 10px; font-size: 10px; text-transform: uppercase; border-radius: 3px; cursor: pointer; border: 1px solid transparent; background: transparent; font-family: inherit; }
+    .btn-table-adjust { color: var(--gold); border-color: rgba(228, 169, 75, 0.3); background: rgba(228,169,75,0.05); }
+    .btn-table-adjust:hover { background: rgba(228,169,75,0.15); }
+    .btn-table-delete { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); background: rgba(239,68,68,0.05); margin-left: 5px; }
+    .btn-table-delete:hover { background: rgba(239, 68, 68, 0.15); color: #fff; }
+
+    .btn-logout { padding: 6px 12px; font-size: 10px; border-color: rgba(239, 68, 68, 0.4); color: var(--danger); transition: all 0.2s ease; }
+    .btn-logout:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: #fff; }
 
     .table-container { background: var(--dark-card); border: 1px solid rgba(228,169,75,0.22); border-radius: 4px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
@@ -314,7 +298,7 @@
         <section class="table-container">
           <table>
             <thead>
-              <tr><th>SKU ID</th><th>Model Name</th><th>Category Line</th><th>Brand Origin</th><th>Price</th><th>Stock</th><th>Stock Zone</th><th style="text-align:right;">Data Controls</th></tr>
+              <tr><th>SKU ID</th><th>Model Name</th><th>Category Line</th><th>Brand Origin</th><th>Price</th><th>Stock</th><th>Stock Zone</th><th style="text-align:right;">Actions Matrix</th></tr>
             </thead>
             <tbody id="table-products"></tbody>
           </table>
@@ -388,7 +372,7 @@
                 <th style="text-align: right; padding-right: 40px;">Total Actions Performed</th>
               </tr>
             </thead>
-            <tbody id="table-metrics">
+            <tbody id="table-metrics-body">
               <?php if(empty($metricsArr)): ?>
                 <tr><td colspan="2" style="text-align:center; color:rgba(228,169,75,0.4); padding:30px;">No operational transactions linked to an active user account yet.</td></tr>
               <?php else: ?>
@@ -495,7 +479,6 @@
   </div>
 
   <script>
-    // Server-populated arrays loaded directly from MySQL schema definitions
     let tableProducts = <?php echo json_encode($productsArr); ?>;
     let tableBrands = <?php echo json_encode($brandsArr); ?>;
     let tableHistory = <?php echo json_encode($historyArr); ?>;
@@ -511,11 +494,16 @@
       document.getElementById(`pane-${viewName}`).classList.add('active');
     }
 
-    function toggleModal(id, open) {
+    function toggleModal(id, open, targetProdId = null) {
       const modal = document.getElementById(id);
       if(open) {
         modal.classList.add('active');
-        if(id === 'adjustmentModal') setupAdjustmentDropdowns();
+        if(id === 'adjustmentModal') {
+          setupAdjustmentDropdowns();
+          if (targetProdId) {
+            document.getElementById('adj-product').value = targetProdId;
+          }
+        }
       } else {
         modal.classList.remove('active');
       }
@@ -547,7 +535,10 @@
           <td>₱${p.unit_price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
           <td style="text-align:center;"><span class="${p.quantity_on_hand < 10 ? 'status-low' : 'status-high'}">${p.quantity_on_hand}</span></td>
           <td style="color:rgba(245,238,216,0.7); font-style:italic;">${p.location}</td>
-          <td style="text-align:right;"><span style="color:rgba(228,169,75,0.3); font-size:10px;">Enforced</span></td>
+          <td style="text-align:right;">
+            <button class="btn-table-action btn-table-adjust" onclick="toggleModal('adjustmentModal', true, ${p.product_id})">Adjust</button>
+            <button class="btn-table-action btn-table-delete" onclick="executeProductDeletion(${p.product_id}, '${p.product_name.replace(/'/g, "\\'")}')">Delete</button>
+          </td>
         </tr>
       `).join('');
     }
@@ -606,7 +597,6 @@
       `).join('');
     }
 
-    // ─── ASYNC BACKEND EXECUTION ROUTERS ───
     async function createNewProduct(e) {
       e.preventDefault();
       const payload = {
@@ -665,7 +655,6 @@
       }
     }
 
-    // JS Action Added Here to Create New Users
     async function createNewUser(e) {
       e.preventDefault();
       const payload = {
@@ -719,6 +708,35 @@
         }
       } catch (err) {
         alert("Connection link failure.");
+      }
+    }
+
+    async function executeProductDeletion(productId, productName) {
+      if (!confirm(`Are you absolutely sure you want to permanently delete "${productName}"?\nThis action will also clear related history records.`)) {
+          return;
+      }
+
+      try {
+          const response = await fetch('process_actions.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  'action': 'DELETE_PRODUCT',
+                  'product_id': productId
+              })
+          });
+
+          const data = await response.json();
+
+          if (data.status === 'success') {
+              tableProducts = tableProducts.filter(p => p.product_id !== productId);
+              executeGlobalFilters();
+              alert(`Purged: "${productName}" removed successfully.`);
+          } else {
+              alert(`Error: ${data.message}`);
+          }
+      } catch (err) {
+          alert("Critical transmission error linking to process_actions.php.");
       }
     }
 

@@ -179,7 +179,39 @@ try {
             $conn->commit();
             echo json_encode(['status' => 'success', 'message' => 'Stock history ledger updated and database availability flags recorded successfully.']);
             break;
+        // ─── ADD THIS INSIDE THE switch($action) BLOCK IN process_actions.php ───
 
+        case 'DELETE_PRODUCT':
+            $productId = (int)$payload['product_id'];
+
+            if ($productId <= 0) {
+                throw new Exception("Invalid or malformed target product identifier reference.");
+            }
+
+            // Initialize atomic transaction block to clean up item logs cleanly
+            $conn->begin_transaction();
+
+            // Step A: Purge related historical entries from the stock history tracking table
+            $cleanLogsStmt = $conn->prepare("DELETE FROM tbl_stock_history WHERE product_id = ?");
+            $cleanLogsStmt->bind_param("i", $productId);
+            $cleanLogsStmt->execute();
+            $cleanLogsStmt->close();
+
+            // Step B: Permanently delete the asset entry row from the main products catalog
+            $deleteProdStmt = $conn->prepare("DELETE FROM tbl_products WHERE product_id = ?");
+            $deleteProdStmt->bind_param("i", $productId);
+            $deleteProdStmt->execute();
+            
+            if ($deleteProdStmt->affected_rows === 0) {
+                throw new Exception("Target asset record could not be found or was already removed from the schema.");
+            }
+            $deleteProdStmt->close();
+
+            // Securely commit database state transformations
+            $conn->commit();
+            echo json_encode(['status' => 'success', 'message' => 'Product asset and associated history logs successfully purged.']);
+            break;
+            
         default:
             throw new Exception("Specified command pipeline action not found on server routing.");
     }
