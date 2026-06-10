@@ -4,7 +4,7 @@ session_start();
 // Unset all global tracking references - clear
 $_SESSION = array();
 
-// Wipe active cookie details
+// Wipe cookie details
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 42000,

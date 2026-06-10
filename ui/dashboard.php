@@ -2,7 +2,6 @@
 
   require_once '../db/db_connection.php'; 
 
-
   // Fetch Active Categories
   $categoriesArr = [];
   $catResult = mysqli_query($conn, "SELECT * FROM tbl_categories"); //QUERY 2:  Fetch Active System Categories
@@ -47,13 +46,13 @@
       $historyArr[] = $row;
   }
 
-  // Query 6: Count how many inventory transactions each employee has performed
+// Query 6: Count how many inventory transactions each employee has performed (Including new users with 0)
   $metricsArr = [];
   $metricsQuery = "SELECT u.full_name, COUNT(sh.stockHistory_id) AS total_actions_performed
                    FROM tbl_users u
-                   INNER JOIN tbl_stock_history sh ON u.user_id = sh.user_id
+                   LEFT JOIN tbl_stock_history sh ON u.user_id = sh.user_id
                    GROUP BY u.user_id, u.full_name
-                   HAVING total_actions_performed > 0";
+                   ORDER BY total_actions_performed DESC";
   $metricsResult = mysqli_query($conn, $metricsQuery);
   if ($metricsResult) {
       while ($row = mysqli_fetch_assoc($metricsResult)) {
@@ -245,7 +244,7 @@
     </div>
     <div class="user-profile">
       <div class="user-details">
-        <span>Jian Karlo H. Alatiit</span>
+        <span>Administrator</span>
         <span class="role-badge">Super Admin</span>
       </div>
       <a href="logout.php" class="btn btn-secondary btn-logout">🚪 Sign Out</a>
@@ -375,8 +374,11 @@
 
       <div id="pane-metrics" class="view-pane">
         <section class="action-row">
-          <h2 class="panel-title">Employee Productivity Matrix</h2>
-          <span style="font-size: 11px; color: rgba(228,169,75,0.65);">System Actions Auditing Profile Summary</span>
+          <div>
+            <h2 class="panel-title">Employee Productivity Matrix</h2>
+            <span style="font-size: 11px; color: rgba(228,169,75,0.65);">System Actions Auditing Profile Summary</span>
+          </div>
+          <button class="btn" onclick="toggleModal('userModal', true)">➕ Provision New User</button>
         </section>
         <section class="table-container">
           <table>
@@ -457,6 +459,37 @@
           <div class="form-field"><label>Units Volume</label><input type="number" id="adj-qty" min="1" required value="1"></div>
         </div>
         <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Commit Log Entry & Modify Balances</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="userModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Provision New System User</h3>
+        <button class="modal-close" onclick="toggleModal('userModal', false)">&times;</button>
+      </div>
+      <form onsubmit="createNewUser(event)">
+        <div class="form-field">
+          <label>Employee Full Name</label>
+          <input type="text" id="u-fullname" required placeholder="e.g., Jane Doe">
+        </div>
+        <div class="form-field">
+          <label>System Username</label>
+          <input type="text" id="u-username" required placeholder="e.g., jane_staff">
+        </div>
+        <div class="form-field">
+          <label>Security Password</label>
+          <input type="password" id="u-password" required placeholder="••••••••">
+        </div>
+        <div class="form-field">
+          <label>System Role Assignment</label>
+          <select id="u-role" required>
+            <option value="2">Staff (Standard Terminal)</option>
+            <option value="1">Administrator (Enterprise Console)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Create User Account</button>
       </form>
     </div>
   </div>
@@ -623,6 +656,36 @@
         const result = await response.json();
         if (result.status === 'success') {
           alert(result.message);
+          location.reload();
+        } else {
+          alert(`Rejected: ${result.message}`);
+        }
+      } catch (err) {
+        alert("Connection lost to API processor router script.");
+      }
+    }
+
+    // JS Action Added Here to Create New Users
+    async function createNewUser(e) {
+      e.preventDefault();
+      const payload = {
+        action: 'CREATE_USER',
+        full_name: document.getElementById('u-fullname').value,
+        username: document.getElementById('u-username').value,
+        password: document.getElementById('u-password').value,
+        role_id: parseInt(document.getElementById('u-role').value)
+      };
+
+      try {
+        const response = await fetch('process_actions.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+          alert(result.message);
+          toggleModal('userModal', false);
           location.reload();
         } else {
           alert(`Rejected: ${result.message}`);

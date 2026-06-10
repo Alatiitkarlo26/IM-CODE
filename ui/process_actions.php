@@ -37,14 +37,31 @@ try {
                 throw new Exception("All core product specification fields are required.");
             }
 
-         // Query 7: Provision a New Product Asset Records a newly registered instrument into the active inventory database, 
-         // assigning its core metadata, pricing, and physical location.
+            // Start an atomic transaction to ensure both product and ledger update safely
+            $conn->begin_transaction();
+
+            // 1. Provision the New Product Asset
             $stmt = $conn->prepare("INSERT INTO tbl_products (product_name, category_id, brand_id, unit_price, quantity_on_hand, location) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("siidis", $name, $catId, $brandId, $price, $qty, $location);
             $stmt->execute();
+            
+            // Capture the newly generated Product ID from the database
+            $newProductId = $stmt->insert_id;
             $stmt->close();
 
-            echo json_encode(['status' => 'success', 'message' => 'Asset provisioned and cataloged successfully.']);
+            // 2. Automatically Log into Transaction Ledger if initial stock is greater than 0
+            if ($qty > 0) {
+                $logType = 'Stock-In';
+                $logStmt = $conn->prepare("INSERT INTO tbl_stock_history (product_id, user_id, stock_type, quantity) VALUES (?, ?, ?, ?)");
+                $logStmt->bind_param("iisi", $newProductId, $userId, $logType, $qty);
+                $logStmt->execute();
+                $logStmt->close();
+            }
+
+            // Commit safely executed changes
+            $conn->commit();
+
+            echo json_encode(['status' => 'success', 'message' => 'Asset provisioned and initial stock cataloged in ledger successfully.']);
             break;
 
         case 'CREATE_BRAND':
@@ -57,13 +74,38 @@ try {
                 throw new Exception("All manufacturer corporate fields are required.");
             }
 
-        //  Query 8: Establish a New Brand Profile to the brand directory, storing their corporate contact information.
+            // Query 8: Establish a New Brand Profile to the brand directory, storing their corporate contact information.
             $stmt = $conn->prepare("INSERT INTO tbl_brands (brand_name, phone, email, address) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("ssss", $brandName, $phone, $email, $address);
             $stmt->execute();
             $stmt->close();
 
             echo json_encode(['status' => 'success', 'message' => 'Manufacturer entity initialized and operational nodes established.']);
+            break;
+
+       case 'CREATE_USER':
+            $fullName = trim($payload['full_name']);
+            $newUsername = trim($payload['username']);
+            $newPassword = trim($payload['password']);
+            $roleId = (int)$payload['role_id'];
+
+            if (empty($fullName) || empty($newUsername) || empty($newPassword) || empty($roleId)) {
+                throw new Exception("All user account fields are required.");
+            }
+
+            // Storing password exactly as inputted (Plaintext) per system architecture
+            $stmt = $conn->prepare("INSERT INTO tbl_users (full_name, username, password, role_id) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("sssi", $fullName, $newUsername, $newPassword, $roleId);
+            
+            if (!$stmt->execute()) {
+                if ($conn->errno === 1062) { 
+                    throw new Exception("That username is already taken. Please choose another.");
+                }
+                throw new Exception("Database error while creating user.");
+            }
+            $stmt->close();
+
+            echo json_encode(['status' => 'success', 'message' => 'New system account provisioned successfully.']);
             break;
 
       case 'EXECUTE_ADJUSTMENT':
@@ -142,7 +184,8 @@ try {
             throw new Exception("Specified command pipeline action not found on server routing.");
     }
 } catch (Exception $e) {
-    if ($action === 'EXECUTE_ADJUSTMENT') {
+    // Revert mutations if atomic framework snaps for EITHER transaction
+    if ($action === 'EXECUTE_ADJUSTMENT' || $action === 'CREATE_PRODUCT') {
         $conn->rollback(); 
     }
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
