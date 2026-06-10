@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($username) && !empty($password)) {
         
-        // 1. Query the matching user profile
+// Query 1  the matching user profile
         $sql = "SELECT * FROM tbl_users WHERE username = ? LIMIT 1";
         $stmt = $conn->prepare($sql);
         

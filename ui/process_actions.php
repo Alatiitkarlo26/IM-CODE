@@ -40,6 +40,9 @@ try {
             // Start an atomic transaction to ensure both product and ledger update safely
             $conn->begin_transaction();
 
+    // Query 7: Provision a New Product Asset Records a newly registered instrument into the 
+            // active inventory database, assigning its core metadata, pricing, and physical location. 
+
             // 1. Provision the New Product Asset
             $stmt = $conn->prepare("INSERT INTO tbl_products (product_name, category_id, brand_id, unit_price, quantity_on_hand, location) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("siidis", $name, $catId, $brandId, $price, $qty, $location);
@@ -74,7 +77,7 @@ try {
                 throw new Exception("All manufacturer corporate fields are required.");
             }
 
-            // Query 8: Establish a New Brand Profile to the brand directory, storing their corporate contact information.
+    // Query 8: Establish a New Brand Profile to the brand directory, storing their corporate contact information.
             $stmt = $conn->prepare("INSERT INTO tbl_brands (brand_name, phone, email, address) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("ssss", $brandName, $phone, $email, $address);
             $stmt->execute();
@@ -93,7 +96,7 @@ try {
                 throw new Exception("All user account fields are required.");
             }
 
-            // Storing password exactly as inputted (Plaintext) per system architecture
+    // Query 11: Provision New System User Account
             $stmt = $conn->prepare("INSERT INTO tbl_users (full_name, username, password, role_id) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("sssi", $fullName, $newUsername, $newPassword, $roleId);
             
@@ -121,7 +124,7 @@ try {
             $conn->begin_transaction();
 
             // Validate item availability state prior to stock alterations
-            //QUERY 3 : Concurrency Validation 
+    // QUERY 3 : Concurrency Validation 
             $checkStmt = $conn->prepare("SELECT quantity_on_hand FROM tbl_products WHERE product_id = ? FOR UPDATE");
             $checkStmt->bind_param("i", $productId);
             $checkStmt->execute();
@@ -137,14 +140,14 @@ try {
             }
 
             // STEP A: Insert entry into transaction log ledger
-            // Query 9: Record Audit Ledger Entry Permanently logs a stock action(whether it’s Stock-in or Stock-out) linked to the user who authorized it.
+    // Query 9: Record Audit Ledger Entry Permanently logs a stock action(whether it’s Stock-in or Stock-out) linked to the user who authorized it.
             $logStmt = $conn->prepare("INSERT INTO tbl_stock_history (product_id, user_id, stock_type, quantity) VALUES (?, ?, ?, ?)");
             $logStmt->bind_param("iisi", $productId, $userId, $type, $qty);
             $logStmt->execute();
             $logStmt->close();
 
             // STEP B: Perform dynamic balancing adjustment updates against production metrics
-            // Query 10: Dynamic Stock Balance Adjustment (UPDATE) While not an INSERT query, 
+     // Query 10: Dynamic Stock Balance Adjustment (UPDATE) While not an INSERT query, 
             // this critical UPDATE runs in the same transaction block as Query 9 to actively 
             // adjust the total units of a specific product based on the transaction type.
             if ($type === 'Stock-In') {
@@ -179,7 +182,6 @@ try {
             $conn->commit();
             echo json_encode(['status' => 'success', 'message' => 'Stock history ledger updated and database availability flags recorded successfully.']);
             break;
-        // ─── ADD THIS INSIDE THE switch($action) BLOCK IN process_actions.php ───
 
         case 'DELETE_PRODUCT':
             $productId = (int)$payload['product_id'];
@@ -190,13 +192,13 @@ try {
 
             // Initialize atomic transaction block to clean up item logs cleanly
             $conn->begin_transaction();
-
+    // Query 13: Delete Stock History
             // Step A: Purge related historical entries from the stock history tracking table
             $cleanLogsStmt = $conn->prepare("DELETE FROM tbl_stock_history WHERE product_id = ?");
             $cleanLogsStmt->bind_param("i", $productId);
             $cleanLogsStmt->execute();
             $cleanLogsStmt->close();
-
+    // Query 12: Delete Product        
             // Step B: Permanently delete the asset entry row from the main products catalog
             $deleteProdStmt = $conn->prepare("DELETE FROM tbl_products WHERE product_id = ?");
             $deleteProdStmt->bind_param("i", $productId);
@@ -211,7 +213,7 @@ try {
             $conn->commit();
             echo json_encode(['status' => 'success', 'message' => 'Product asset and associated history logs successfully purged.']);
             break;
-            
+
         default:
             throw new Exception("Specified command pipeline action not found on server routing.");
     }

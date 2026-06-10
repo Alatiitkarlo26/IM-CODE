@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     
-    //QUERY 1:User Identity and Security Authentication -  Securely pull the user records from tbl_users using prepared statements
+//QUERY 1:User Identity and Security Authentication -  Securely pull the user records from tbl_users using prepared statements
     $stmt = $conn->prepare("SELECT user_id, username, password, full_name, role FROM tbl_users WHERE username = ? LIMIT 1");
     $stmt->bind_param("s", $username);
     $stmt->execute();
