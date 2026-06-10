@@ -114,7 +114,7 @@ try {
             $updateStmt->execute();
             $updateStmt->close();
 
-            // ─── NEW FEATURE LAYER: DYNAMIC IS_AVAILABLE STATUS FLIPPER ───
+            //  IS_AVAILABLE STATUS  ───
             // Fetch the updated quantity directly from the database to see the final calculation result
             $finalCheckStmt = $conn->prepare("SELECT quantity_on_hand FROM tbl_products WHERE product_id = ?");
             $finalCheckStmt->bind_param("i", $productId);
@@ -134,7 +134,6 @@ try {
             }
             // ──────────────────────────────────────────────────────────────
 
-            // Commit safely executed ledger changes
             $conn->commit();
             echo json_encode(['status' => 'success', 'message' => 'Stock history ledger updated and database availability flags recorded successfully.']);
             break;
@@ -144,7 +143,7 @@ try {
     }
 } catch (Exception $e) {
     if ($action === 'EXECUTE_ADJUSTMENT') {
-        $conn->rollback(); // Revert backplane mutations if atomic framework snaps
+        $conn->rollback(); 
     }
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }

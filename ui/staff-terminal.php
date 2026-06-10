@@ -1,21 +1,18 @@
 <?php
-  // Start the session at the absolute top of the file
+
   session_start();
 
-  // Use absolute directory magic constant to safely include the db layer line
+
   require_once __DIR__ . '/../db/db_connection.php';
 
-  // Security Access Control Layer — Ensure only authenticated Staff can view this terminal
+
   if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Staff') {
       header("Location: index.php");
       exit();
   }
-
-  // Get active current user session token ID to filter productivity if needed
   $current_user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
 
-  // ─── PHP BACKEND INITIAL RETRIEVAL PIPELINES ───
-  // Fetch Active Categories for Filter Dropdown
+
   $categoriesArr = [];
   $catResult = mysqli_query($conn, "SELECT * FROM tbl_categories");
   if ($catResult) {
@@ -24,7 +21,7 @@
       }
   }
 
-  // Fetch Active Brands for Filter Dropdown
+
   $brandsArr = [];
   $brandResult = mysqli_query($conn, "SELECT * FROM tbl_brands");
   if ($brandResult) {
@@ -33,7 +30,7 @@
       }
   }
 
-  // Fetch Products with Relational Parent Joins
+
   $productsArr = [];
   if ($conn) {
       $prodQuery = "SELECT p.*, c.category_name, b.brand_name 
@@ -51,7 +48,7 @@
       }
   }
 
-  // Fetch Employee Productivity Metrics (Query 10)
+
   $metricsArr = [];
   $metricsQuery = "SELECT u.full_name, COUNT(sh.stockHistory_id) AS total_actions_performed
                    FROM tbl_users u
