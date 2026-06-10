@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $row['username'];
             $_SESSION['full_name'] = $row['full_name'];
             
-            // Standardize role detection strings (handles 'role', 'role_id', 'user_type')
+            // handles 'role', 'role_id', 'user_type'
             $detected_role = "";
             if (isset($row['role'])) { $detected_role = $row['role']; }
             if (isset($row['role_id'])) { $detected_role = $row['role_id']; }
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $detected_role = trim(strtolower((string)$detected_role));
 
-            // Strict Role-Based Endpoint Dispatch Router (Normalized to Title Case matches)
+           
             if ($detected_role === 'admin' || $detected_role === 'super admin' || $detected_role === '1') {
                 $_SESSION['role'] = 'Admin';
                 header("Location: dashboard.php");

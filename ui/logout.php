@@ -1,11 +1,10 @@
 <?php
-// Initialize session tracking architecture
 session_start();
 
-// Unset all global tracking references
+// Unset all global tracking references - clear
 $_SESSION = array();
 
-// Wipe active tracking cookie details completely from the client browser
+// Wipe active cookie details
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 42000,
@@ -14,10 +13,10 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Kill server state context tracking file
+
 session_destroy();
 
-// Safely route the client back to the authentication portal dashboard root
+// Route user to login
 header("Location: index.php");
 exit();
 ?>

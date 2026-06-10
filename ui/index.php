@@ -2,19 +2,18 @@
 // Start the session at the absolute top of the file
 session_start();
 
-// Go up one folder, then into the db folder to find the connection script
 require_once '../db/db_connection.php'; 
 
 $error_msg = "";
 
-// Handle authentication request pipeline upon form submission
+// Handle authentication request 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
     if (!empty($username) && !empty($password)) {
         
-        // 1. Query the matching user profile signature
+        // 1. Query the matching user profile
         $sql = "SELECT * FROM tbl_users WHERE username = ? LIMIT 1";
         $stmt = $conn->prepare($sql);
         
@@ -22,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("SQL Preparation Failure Error: " . $conn->error);
         }
 
-        // 2. Securely bind signatures and execute parameters
+        // 2. execute parameters
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -30,14 +29,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result && $result->num_rows > 0) {
             $user = $result->fetch_assoc();
 
-            // Verify plaintext credentials match your active database table entries
+           
             if ($password === $user['password']) { 
                 
-                // Establish user_id session token
+               
                 $_SESSION['user_id'] = $user['user_id'] ?? $user['id'];
                 $_SESSION['username'] = $user['username'];
                 
-                // Fallback architecture matching column permutations safely
+                
                 $detected_role = "";
                 if (isset($user['role'])) { $detected_role = $user['role']; }
                 if (isset($user['role_id'])) { $detected_role = $user['role_id']; }
@@ -46,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Clean input formatting string variations (e.g., matching 1/admin/Admin)
                 $detected_role = trim(strtolower((string)$detected_role));
   
-                // 3. Multi-Role Gateway Routing Engine (Saves explicitly standardized session keys)
+                
                 if ($detected_role === 'admin' || $detected_role === 'super admin' || $detected_role === '1') {
                     $_SESSION['role'] = 'Admin';
                     header("Location: dashboard.php");

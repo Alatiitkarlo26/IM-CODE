@@ -1,8 +1,8 @@
 <?php
-  // Go up one folder, then into the db folder to find the connection script
+
   require_once '../db/db_connection.php'; 
 
-  // ─── PHP BACKEND INITIAL RETRIEVAL PIPELINES ───
+
   // Fetch Active Categories
   $categoriesArr = [];
   $catResult = mysqli_query($conn, "SELECT * FROM tbl_categories"); //QUERY 2:  Fetch Active System Categories
