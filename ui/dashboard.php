@@ -3,6 +3,7 @@
 
   // Fetch Active Categories
   $categoriesArr = [];
+//QUERY 2:  Fetch Active System Categories
   $catResult = mysqli_query($conn, "SELECT * FROM tbl_categories"); 
   while ($row = mysqli_fetch_assoc($catResult)) {
       $categoriesArr[] = $row;
@@ -15,7 +16,8 @@
       $brandsArr[] = $row;
   }
 
-  // Fetch Products with Relational Parent Joins
+// Fetch Products with Relational Parent Joins
+//QUERY 4: The Master Product Matrix
   $productsArr = [];
   $prodQuery = "SELECT p.*, c.category_name, b.brand_name 
                 FROM tbl_products p
@@ -31,7 +33,8 @@
       $productsArr[] = $row;
   }
 
-  // Fetch System Transaction History Ledger Rows
+// Fetch System Transaction History Ledger Rows
+//QUERY 5: System Transaction History Ledger 
   $historyArr = [];
   $histQuery = "SELECT h.*, p.product_name, u.full_name 
                 FROM tbl_stock_history h
@@ -43,7 +46,8 @@
       $historyArr[] = $row;
   }
 
-  // Fetch Employee Productivity Metrics
+// Fetch Employee Productivity Metrics
+// Query 6: Count how many inventory transactions each employee has performed (Including new users with 0)
   $metricsArr = [];
   $metricsQuery = "SELECT u.full_name, COUNT(sh.stockHistory_id) AS total_actions_performed
                    FROM tbl_users u
